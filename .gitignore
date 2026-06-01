@@ -1,0 +1,31 @@
+# Build outputs
+*.o
+*.d
+*.a
+*.elf
+*.map
+*.img
+*.bin
+*.tmp
+*.log
+
+# OpenWrt package build scratch files
+ipkg-*/
+.pkgdir/
+.built
+.configured*
+
+# Editor and OS noise
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+Thumbs.db
+Desktop.ini
+*:Zone.Identifier
+
+# Local runtime/cache files
+core
+core.*
+*.bak
