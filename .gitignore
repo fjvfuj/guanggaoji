@@ -24,6 +24,7 @@ ipkg-*/
 Thumbs.db
 Desktop.ini
 *:Zone.Identifier
+*Zone.Identifier
 
 # Local runtime/cache files
 core
