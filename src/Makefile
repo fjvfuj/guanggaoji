@@ -16,6 +16,7 @@ INCLUDES = -I$(LVGL_DIR)/ \
             -I$(LVGL_DIR)/System \
             -I$(LVGL_DIR)/System/ota \
             -I$(LVGL_DIR)/Embedded \
+            -I$(LVGL_DIR)/NewUI \
             -I$(LVGL_DIR)/Common \
             -I$(LVGL_DIR)/Common/setting \
             -I$(LVGL_DIR)/Common/language/string \
@@ -36,6 +37,7 @@ SRCDIRS = $(LVGL_DIR)/widget \
         $(LVGL_DIR)/Layer \
         $(LVGL_DIR)/Network \
         $(LVGL_DIR)/Embedded \
+        $(LVGL_DIR)/NewUI \
         $(LVGL_DIR)/Setting \
         $(LVGL_DIR)/Source \
         $(LVGL_DIR)/Media \
