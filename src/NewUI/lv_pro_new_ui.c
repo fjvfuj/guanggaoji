@@ -1,4 +1,5 @@
 #include "lv_pro_new_ui.h"
+#include "lv_pro_new_ui_layout.h"
 
 #include "Embedded/emb_device.h"
 #include "Embedded/emb_network.h"
@@ -8,14 +9,6 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
-
-#define UI_W 1920
-#define UI_H 1080
-#define TOPBAR_H 88
-#define PAGE_Y 92
-#define PAGE_H 790
-#define NAV_Y 900
-#define NAV_H 76
 
 #define C_BG          0xf4f7fb
 #define C_PANEL       0xffffff
@@ -231,7 +224,7 @@ static void create_topbar(lv_obj_t *root)
     s_topbar = lv_obj_create(root);
     style_rect(s_topbar, 0, lv_color_hex(C_BG));
     lv_obj_set_style_bg_opa(s_topbar, LV_OPA_TRANSP, 0);
-    lv_obj_set_size(s_topbar, UI_W, TOPBAR_H);
+    lv_obj_set_size(s_topbar, UI_W, UI_TOPBAR_H);
     lv_obj_set_pos(s_topbar, 0, 0);
 
     brand = box(s_topbar, 28, 18, 196, 58, 29, lv_color_hex(C_PANEL));
@@ -251,15 +244,15 @@ static void create_topbar(lv_obj_t *root)
 static void create_bottom_nav(lv_obj_t *root)
 {
     int i;
-    lv_coord_t item_w = 128;
-    lv_coord_t gap = 20;
+    lv_coord_t item_w = UI_NAV_ITEM_W;
+    lv_coord_t gap = UI_NAV_GAP;
     lv_coord_t start_x;
 
-    s_bottom_nav = box(root, 32, NAV_Y, UI_W - 64, NAV_H, 38, lv_color_hex(C_PANEL));
+    s_bottom_nav = box(root, UI_NAV_X, UI_NAV_Y, UI_NAV_W, UI_NAV_H, 38, lv_color_hex(C_PANEL));
     lv_obj_set_style_shadow_width(s_bottom_nav, 26, 0);
     lv_obj_set_style_shadow_opa(s_bottom_nav, LV_OPA_20, 0);
 
-    start_x = (UI_W - 64 - item_w * LV_PRO_NEW_PAGE_COUNT -
+    start_x = (UI_NAV_W - item_w * LV_PRO_NEW_PAGE_COUNT -
                gap * (LV_PRO_NEW_PAGE_COUNT - 1)) / 2;
     for (i = 0; i < LV_PRO_NEW_PAGE_COUNT; i++) {
         lv_obj_t *btn = lv_btn_create(s_bottom_nav);
@@ -297,8 +290,8 @@ static void update_shell_visibility(lv_pro_new_page_t page)
         lv_obj_clear_flag(s_bottom_nav, LV_OBJ_FLAG_HIDDEN);
     }
     if (s_page_layer != NULL) {
-        lv_obj_set_pos(s_page_layer, 0, media ? 0 : PAGE_Y);
-        lv_obj_set_size(s_page_layer, UI_W, media ? UI_H : PAGE_H);
+        lv_obj_set_pos(s_page_layer, 0, media ? 0 : UI_PAGE_Y);
+        lv_obj_set_size(s_page_layer, UI_W, media ? UI_H : UI_PAGE_H);
     }
 }
 
@@ -360,14 +353,15 @@ static void create_home_page(void)
 
     read_home_state(source, sizeof(source), network, sizeof(network), version, sizeof(version));
 
-    hero = box(s_page_layer, 22, 0, UI_W - 44, 610, 28, lv_color_hex(0x253f62));
+    hero = box(s_page_layer, UI_EDGE_X, UI_HERO_Y, UI_HERO_W, UI_HERO_H,
+               UI_HERO_RADIUS, lv_color_hex(0x253f62));
     lv_obj_set_style_bg_grad_color(hero, lv_color_hex(0x0d2350), 0);
     lv_obj_set_style_bg_grad_dir(hero, LV_GRAD_DIR_VER, 0);
     lv_obj_set_style_shadow_width(hero, 0, 0);
 
     overlay = lv_obj_create(hero);
     style_rect(overlay, 28, lv_color_hex(0x254b74));
-    lv_obj_set_size(overlay, UI_W - 44, 610);
+    lv_obj_set_size(overlay, UI_HERO_W, UI_HERO_H);
     lv_obj_set_pos(overlay, 0, 0);
     lv_obj_set_style_bg_grad_color(overlay, lv_color_hex(0x151b4f), 0);
     lv_obj_set_style_bg_grad_dir(overlay, LV_GRAD_DIR_VER, 0);
@@ -382,12 +376,14 @@ static void create_home_page(void)
     label_fit(hero, "图片轮播 / 背景音乐已开启", font_cn_mid(),
               lv_color_white(), 40, 560, 760);
 
-    time_card = box(s_page_layer, 22, 622, 320, 118, 24, lv_color_hex(C_PANEL));
+    time_card = box(s_page_layer, UI_TIME_CARD_X, UI_HOME_META_Y,
+                    UI_TIME_CARD_W, UI_HOME_META_H, 24, lv_color_hex(C_PANEL));
     label(time_card, "Weather", font_cn_small(), lv_color_hex(C_MUTED), 22, 16);
     label(time_card, "16:57", &lv_font_montserrat_46, lv_color_hex(C_DARK), 22, 42);
     label(time_card, "5/22 Fri 27C", font_cn_small(), lv_color_hex(C_MUTED), 22, 88);
 
-    quick = box(s_page_layer, 356, 622, UI_W - 378, 118, 24, lv_color_hex(C_PANEL));
+    quick = box(s_page_layer, UI_QUICK_CARD_X, UI_HOME_META_Y,
+                UI_QUICK_CARD_W, UI_HOME_META_H, 24, lv_color_hex(C_PANEL));
     create_home_status_tile(quick, 16, "I", "信号源", source);
     create_home_status_tile(quick, 388, "C", "无线投屏", "待连接");
     create_home_status_tile(quick, 760, "W", "网络", network);
@@ -575,7 +571,7 @@ static void create_photo_page(void)
     label_fit(bg, "轮播中 / 无特效 / 背景音乐开启", font_cn_small(),
               lv_color_hex(C_MUTED), 50, 194, 540);
 
-    dock = box(bg, 668, 792, 584, 76, 38, lv_color_hex(C_PANEL));
+    dock = box(bg, 668, UI_MEDIA_DOCK_Y, 584, 76, 38, lv_color_hex(C_PANEL));
     media_control(dock, 12, "L", 0);
     media_control(dock, 82, "II", 1);
     media_control(dock, 152, "S", 0);
@@ -604,7 +600,7 @@ static void create_video_page(void)
     play = btn_box(bg, 904, 464, 108, 108, 54, lv_color_hex(C_PANEL));
     center_label(play, ">", &lv_font_montserrat_46, lv_color_hex(C_PRIMARY));
 
-    progress = box(bg, 288, 700, 1344, 82, 18, lv_color_hex(C_PANEL));
+    progress = box(bg, 288, UI_VIDEO_PROGRESS_Y, 1344, 82, 18, lv_color_hex(C_PANEL));
     bar = lv_obj_create(progress);
     style_rect(bar, 3, lv_color_hex(C_LINE));
     lv_obj_set_size(bar, 1280, 6);
@@ -616,7 +612,7 @@ static void create_video_page(void)
     label(progress, "00:02:18 / 00:06:04", &lv_font_montserrat_24,
           lv_color_hex(C_MUTED), 1116, 42);
 
-    dock = box(bg, 728, 792, 464, 76, 38, lv_color_hex(C_PANEL));
+    dock = box(bg, 728, UI_MEDIA_DOCK_Y, 464, 76, 38, lv_color_hex(C_PANEL));
     media_control(dock, 12, "L", 0);
     media_control(dock, 82, ">", 0);
     media_control(dock, 152, "S", 0);
@@ -705,8 +701,8 @@ void lv_pro_new_ui_init(void)
     style_rect(s_page_layer, 0, lv_color_hex(C_BG));
     lv_obj_set_style_bg_opa(s_page_layer, LV_OPA_TRANSP, 0);
     lv_obj_set_style_pad_all(s_page_layer, 0, 0);
-    lv_obj_set_pos(s_page_layer, 0, PAGE_Y);
-    lv_obj_set_size(s_page_layer, UI_W, PAGE_H);
+    lv_obj_set_pos(s_page_layer, 0, UI_PAGE_Y);
+    lv_obj_set_size(s_page_layer, UI_W, UI_PAGE_H);
 
     create_bottom_nav(lv_pro_new_ui_activity);
     lv_pro_new_ui_show_page(LV_PRO_NEW_PAGE_HOME);
