@@ -11,6 +11,11 @@
 
 #define UI_W 1920
 #define UI_H 1080
+#define TOPBAR_H 88
+#define PAGE_Y 92
+#define PAGE_H 790
+#define NAV_Y 900
+#define NAV_H 76
 
 #define C_BG          0xf4f7fb
 #define C_PANEL       0xffffff
@@ -226,21 +231,21 @@ static void create_topbar(lv_obj_t *root)
     s_topbar = lv_obj_create(root);
     style_rect(s_topbar, 0, lv_color_hex(C_BG));
     lv_obj_set_style_bg_opa(s_topbar, LV_OPA_TRANSP, 0);
-    lv_obj_set_size(s_topbar, UI_W, 94);
+    lv_obj_set_size(s_topbar, UI_W, TOPBAR_H);
     lv_obj_set_pos(s_topbar, 0, 0);
 
-    brand = box(s_topbar, 36, 26, 196, 58, 29, lv_color_hex(C_PANEL));
+    brand = box(s_topbar, 28, 18, 196, 58, 29, lv_color_hex(C_PANEL));
     logo = box(brand, 9, 8, 42, 42, 12, lv_color_hex(C_PRIMARY_2));
     style_shadow(logo, 12, LV_OPA_30);
     center_label(logo, "E", &lv_font_montserrat_24, lv_color_white());
     title = label_fit(brand, "娱乐便携屏", font_cn_mid(), lv_color_hex(C_INK), 64, 15, 120);
     lv_label_set_long_mode(title, LV_LABEL_LONG_CLIP);
 
-    pill(s_topbar, 804, 26, 226, 52, s_nav_items[s_current_page].icon,
+    pill(s_topbar, 804, 18, 226, 52, s_nav_items[s_current_page].icon,
          s_nav_items[s_current_page].full_title, 1);
-    pill(s_topbar, 1556, 26, 104, 52, "I", "输入", 0);
-    pill(s_topbar, 1672, 26, 104, 52, "C", "投屏", 0);
-    pill(s_topbar, 1788, 26, 104, 52, "W", "WiFi", 0);
+    pill(s_topbar, 1556, 18, 104, 52, "I", "输入", 0);
+    pill(s_topbar, 1672, 18, 104, 52, "C", "投屏", 0);
+    pill(s_topbar, 1788, 18, 104, 52, "W", "WiFi", 0);
 }
 
 static void create_bottom_nav(lv_obj_t *root)
@@ -250,7 +255,7 @@ static void create_bottom_nav(lv_obj_t *root)
     lv_coord_t gap = 20;
     lv_coord_t start_x;
 
-    s_bottom_nav = box(root, 32, 984, UI_W - 64, 76, 38, lv_color_hex(C_PANEL));
+    s_bottom_nav = box(root, 32, NAV_Y, UI_W - 64, NAV_H, 38, lv_color_hex(C_PANEL));
     lv_obj_set_style_shadow_width(s_bottom_nav, 26, 0);
     lv_obj_set_style_shadow_opa(s_bottom_nav, LV_OPA_20, 0);
 
@@ -292,8 +297,8 @@ static void update_shell_visibility(lv_pro_new_page_t page)
         lv_obj_clear_flag(s_bottom_nav, LV_OBJ_FLAG_HIDDEN);
     }
     if (s_page_layer != NULL) {
-        lv_obj_set_pos(s_page_layer, 0, media ? 0 : 104);
-        lv_obj_set_size(s_page_layer, UI_W, media ? UI_H : 868);
+        lv_obj_set_pos(s_page_layer, 0, media ? 0 : PAGE_Y);
+        lv_obj_set_size(s_page_layer, UI_W, media ? UI_H : PAGE_H);
     }
 }
 
@@ -355,14 +360,14 @@ static void create_home_page(void)
 
     read_home_state(source, sizeof(source), network, sizeof(network), version, sizeof(version));
 
-    hero = box(s_page_layer, 22, 0, UI_W - 44, 700, 28, lv_color_hex(0x253f62));
+    hero = box(s_page_layer, 22, 0, UI_W - 44, 610, 28, lv_color_hex(0x253f62));
     lv_obj_set_style_bg_grad_color(hero, lv_color_hex(0x0d2350), 0);
     lv_obj_set_style_bg_grad_dir(hero, LV_GRAD_DIR_VER, 0);
     lv_obj_set_style_shadow_width(hero, 0, 0);
 
     overlay = lv_obj_create(hero);
     style_rect(overlay, 28, lv_color_hex(0x254b74));
-    lv_obj_set_size(overlay, UI_W - 44, 700);
+    lv_obj_set_size(overlay, UI_W - 44, 610);
     lv_obj_set_pos(overlay, 0, 0);
     lv_obj_set_style_bg_grad_color(overlay, lv_color_hex(0x151b4f), 0);
     lv_obj_set_style_bg_grad_dir(overlay, LV_GRAD_DIR_VER, 0);
@@ -370,19 +375,19 @@ static void create_home_page(void)
 
     pill(hero, 24, 26, 124, 46, NULL, "HDMI 在线", 0);
     pill(hero, UI_W - 44 - 136, 26, 112, 46, NULL, "Home_5G", 0);
-    pill(hero, 36, 506, 150, 40, NULL, "高清便携屏", 0);
+    pill(hero, 36, 422, 150, 40, NULL, "高清便携屏", 0);
 
-    title = label(hero, "Mountain Dawn", &lv_font_montserrat_46, lv_color_white(), 36, 550);
+    title = label(hero, "Mountain Dawn", &lv_font_montserrat_46, lv_color_white(), 36, 470);
     lv_obj_set_style_text_font(title, &lv_font_montserrat_46, 0);
     label_fit(hero, "图片轮播 / 背景音乐已开启", font_cn_mid(),
-              lv_color_white(), 40, 640, 760);
+              lv_color_white(), 40, 560, 760);
 
-    time_card = box(s_page_layer, 22, 712, 320, 128, 24, lv_color_hex(C_PANEL));
-    label(time_card, "深圳 晴", font_cn_small(), lv_color_hex(C_MUTED), 22, 20);
-    label(time_card, "16:57", &lv_font_montserrat_46, lv_color_hex(C_DARK), 22, 48);
-    label(time_card, "5月22日 星期五 27C", font_cn_small(), lv_color_hex(C_MUTED), 22, 96);
+    time_card = box(s_page_layer, 22, 622, 320, 118, 24, lv_color_hex(C_PANEL));
+    label(time_card, "Weather", font_cn_small(), lv_color_hex(C_MUTED), 22, 16);
+    label(time_card, "16:57", &lv_font_montserrat_46, lv_color_hex(C_DARK), 22, 42);
+    label(time_card, "5/22 Fri 27C", font_cn_small(), lv_color_hex(C_MUTED), 22, 88);
 
-    quick = box(s_page_layer, 356, 712, UI_W - 378, 128, 24, lv_color_hex(C_PANEL));
+    quick = box(s_page_layer, 356, 622, UI_W - 378, 118, 24, lv_color_hex(C_PANEL));
     create_home_status_tile(quick, 16, "I", "信号源", source);
     create_home_status_tile(quick, 388, "C", "无线投屏", "待连接");
     create_home_status_tile(quick, 760, "W", "网络", network);
@@ -570,7 +575,7 @@ static void create_photo_page(void)
     label_fit(bg, "轮播中 / 无特效 / 背景音乐开启", font_cn_small(),
               lv_color_hex(C_MUTED), 50, 194, 540);
 
-    dock = box(bg, 668, 862, 584, 76, 38, lv_color_hex(C_PANEL));
+    dock = box(bg, 668, 792, 584, 76, 38, lv_color_hex(C_PANEL));
     media_control(dock, 12, "L", 0);
     media_control(dock, 82, "II", 1);
     media_control(dock, 152, "S", 0);
@@ -599,7 +604,7 @@ static void create_video_page(void)
     play = btn_box(bg, 904, 464, 108, 108, 54, lv_color_hex(C_PANEL));
     center_label(play, ">", &lv_font_montserrat_46, lv_color_hex(C_PRIMARY));
 
-    progress = box(bg, 288, 760, 1344, 82, 18, lv_color_hex(C_PANEL));
+    progress = box(bg, 288, 700, 1344, 82, 18, lv_color_hex(C_PANEL));
     bar = lv_obj_create(progress);
     style_rect(bar, 3, lv_color_hex(C_LINE));
     lv_obj_set_size(bar, 1280, 6);
@@ -611,7 +616,7 @@ static void create_video_page(void)
     label(progress, "00:02:18 / 00:06:04", &lv_font_montserrat_24,
           lv_color_hex(C_MUTED), 1116, 42);
 
-    dock = box(bg, 728, 862, 464, 76, 38, lv_color_hex(C_PANEL));
+    dock = box(bg, 728, 792, 464, 76, 38, lv_color_hex(C_PANEL));
     media_control(dock, 12, "L", 0);
     media_control(dock, 82, ">", 0);
     media_control(dock, 152, "S", 0);
@@ -700,8 +705,8 @@ void lv_pro_new_ui_init(void)
     style_rect(s_page_layer, 0, lv_color_hex(C_BG));
     lv_obj_set_style_bg_opa(s_page_layer, LV_OPA_TRANSP, 0);
     lv_obj_set_style_pad_all(s_page_layer, 0, 0);
-    lv_obj_set_pos(s_page_layer, 0, 104);
-    lv_obj_set_size(s_page_layer, UI_W, 868);
+    lv_obj_set_pos(s_page_layer, 0, PAGE_Y);
+    lv_obj_set_size(s_page_layer, UI_W, PAGE_H);
 
     create_bottom_nav(lv_pro_new_ui_activity);
     lv_pro_new_ui_show_page(LV_PRO_NEW_PAGE_HOME);
