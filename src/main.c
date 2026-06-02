@@ -9,7 +9,7 @@
 #include <ucontext.h>
 #include <dlfcn.h>
 #include <pthread.h>
-#include "Network/lv_pro_mqtt_slideshow_activity.h"
+#include "NewUI/lv_pro_new_ui.h"
 
 lv_indev_t *evdev_indev;
 lv_indev_drv_t indev_drv;
@@ -125,7 +125,7 @@ int main(int argc, char *argv[]) {
 #endif
     }
 
-    printf("[Main] MQTT Image Slideshow Starting...\n");
+    printf("[Main] LVGL New UI Starting...\n");
 
     /*LVGL init*/
     lv_init();
@@ -172,11 +172,8 @@ int main(int argc, char *argv[]) {
     // Initialize input device
     keypad_int();
 
-    // Initialize MQTT slideshow UI
-    lv_pro_mqtt_slideshow_ui_init();
-
-    // Start MQTT slideshow
-    lv_pro_mqtt_slideshow_start();
+    // Initialize the new advertising screen UI shell.
+    lv_pro_new_ui_init();
 
     printf("[Main] Entering main loop...\n");
 
@@ -189,7 +186,6 @@ int main(int argc, char *argv[]) {
     }
 
     // Cleanup (unreachable in normal operation)
-    lv_pro_mqtt_slideshow_exit();
     sunxifb_exit();
     return 0;
 }
