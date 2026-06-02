@@ -618,6 +618,12 @@ void lv_pro_new_ui_init(void)
         lv_pro_new_ui_activity = NULL;
     }
 
+    s_topbar = NULL;
+    s_page_layer = NULL;
+    s_bottom_nav = NULL;
+    memset(s_nav_buttons, 0, sizeof(s_nav_buttons));
+    s_current_page = LV_PRO_NEW_PAGE_HOME;
+
     lv_pro_new_ui_activity = lv_obj_create(NULL);
     lv_obj_set_size(lv_pro_new_ui_activity, LV_PCT(100), LV_PCT(100));
     style_rect(lv_pro_new_ui_activity, 0, lv_color_hex(C_BG));
@@ -635,4 +641,5 @@ void lv_pro_new_ui_init(void)
 
     create_bottom_nav(lv_pro_new_ui_activity);
     lv_pro_new_ui_show_page(LV_PRO_NEW_PAGE_HOME);
+    lv_scr_load(lv_pro_new_ui_activity);
 }
