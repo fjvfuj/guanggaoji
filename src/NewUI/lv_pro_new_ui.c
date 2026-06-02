@@ -29,12 +29,15 @@ typedef struct {
     const char *icon;
 } ui_nav_item_t;
 
+extern lv_indev_t *evdev_indev;
+
 lv_obj_t *lv_pro_new_ui_activity;
 
 static lv_obj_t *s_topbar;
 static lv_obj_t *s_page_layer;
 static lv_obj_t *s_bottom_nav;
 static lv_obj_t *s_nav_buttons[LV_PRO_NEW_PAGE_COUNT];
+static lv_group_t *s_nav_group;
 static lv_pro_new_page_t s_current_page = LV_PRO_NEW_PAGE_HOME;
 
 static const ui_nav_item_t s_nav_items[LV_PRO_NEW_PAGE_COUNT] = {
@@ -43,10 +46,14 @@ static const ui_nav_item_t s_nav_items[LV_PRO_NEW_PAGE_COUNT] = {
     {"投屏", "无线投屏", "C"},
     {"图片", "图片播放", "P"},
     {"视频", "视频播放", "V"},
-    {"时钟", "实时钟", "T"},
+    {"时钟", "实时时钟", "T"},
     {"网络", "WiFi 网络", "W"},
     {"设置", "主设置", "S"},
 };
+
+static const lv_font_t *font_cn_small(void) { return &GENERAL_FONT_SMALL; }
+static const lv_font_t *font_cn_mid(void) { return &GENERAL_FONT_MID; }
+static const lv_font_t *font_cn_big(void) { return &GENERAL_FONT_BIG; }
 
 static void style_rect(lv_obj_t *obj, lv_coord_t radius, lv_color_t bg)
 {
@@ -63,6 +70,13 @@ static void style_shadow(lv_obj_t *obj, lv_coord_t width, lv_opa_t opa)
     lv_obj_set_style_shadow_color(obj, lv_color_hex(0xd6dde9), 0);
     lv_obj_set_style_shadow_opa(obj, opa, 0);
     lv_obj_set_style_shadow_ofs_y(obj, 12, 0);
+}
+
+static void style_focus(lv_obj_t *obj)
+{
+    lv_obj_set_style_outline_width(obj, 3, LV_STATE_FOCUSED);
+    lv_obj_set_style_outline_color(obj, lv_color_hex(C_PRIMARY), LV_STATE_FOCUSED);
+    lv_obj_set_style_outline_pad(obj, 2, LV_STATE_FOCUSED);
 }
 
 static lv_obj_t *box(lv_obj_t *parent, lv_coord_t x, lv_coord_t y,
@@ -89,6 +103,7 @@ static lv_obj_t *btn_box(lv_obj_t *parent, lv_coord_t x, lv_coord_t y,
     lv_obj_set_pos(obj, x, y);
     lv_obj_set_style_pad_all(obj, 0, 0);
     style_shadow(obj, 14, LV_OPA_20);
+    style_focus(obj);
     return obj;
 }
 
@@ -104,10 +119,32 @@ static lv_obj_t *label(lv_obj_t *parent, const char *text, const lv_font_t *font
     return obj;
 }
 
+static lv_obj_t *label_fit(lv_obj_t *parent, const char *text, const lv_font_t *font,
+                           lv_color_t color, lv_coord_t x, lv_coord_t y,
+                           lv_coord_t w)
+{
+    lv_obj_t *obj = label(parent, text, font, color, x, y);
+
+    lv_obj_set_width(obj, w);
+    lv_label_set_long_mode(obj, LV_LABEL_LONG_DOT);
+    return obj;
+}
+
 static lv_obj_t *center_label(lv_obj_t *parent, const char *text, const lv_font_t *font,
                               lv_color_t color)
 {
     lv_obj_t *obj = label(parent, text, font, color, 0, 0);
+    lv_obj_center(obj);
+    return obj;
+}
+
+static lv_obj_t *center_label_fit(lv_obj_t *parent, const char *text,
+                                  const lv_font_t *font, lv_color_t color)
+{
+    lv_coord_t w = lv_obj_get_width(parent);
+    lv_obj_t *obj = label_fit(parent, text, font, color, 0, 0, w > 12 ? w - 12 : w);
+
+    lv_obj_set_style_text_align(obj, LV_TEXT_ALIGN_CENTER, 0);
     lv_obj_center(obj);
     return obj;
 }
@@ -124,17 +161,12 @@ static lv_obj_t *pill(lv_obj_t *parent, lv_coord_t x, lv_coord_t y,
     lv_obj_set_style_shadow_width(obj, active ? 22 : 12, 0);
     lv_obj_set_style_shadow_opa(obj, active ? LV_OPA_30 : LV_OPA_10, 0);
     if (icon != NULL && icon[0] != '\0') {
-        snprintf(buf, sizeof(buf), "%s  %s", icon, text);
+        snprintf(buf, sizeof(buf), "%s %s", icon, text);
     } else {
         snprintf(buf, sizeof(buf), "%s", text);
     }
-    center_label(obj, buf, &GENERAL_FONT_SMALL, color);
+    center_label_fit(obj, buf, font_cn_small(), color);
     return obj;
-}
-
-static void set_text_center(lv_obj_t *obj)
-{
-    lv_obj_set_style_text_align(obj, LV_TEXT_ALIGN_CENTER, 0);
 }
 
 static void clear_page_layer(void)
@@ -144,15 +176,24 @@ static void clear_page_layer(void)
     }
 }
 
-static void nav_event_cb(lv_event_t *e)
-{
-    lv_pro_new_page_t page = (lv_pro_new_page_t)(uintptr_t)lv_event_get_user_data(e);
-    lv_pro_new_ui_show_page(page);
-}
-
 static int page_is_media(lv_pro_new_page_t page)
 {
     return page == LV_PRO_NEW_PAGE_PHOTO || page == LV_PRO_NEW_PAGE_VIDEO;
+}
+
+static void nav_event_cb(lv_event_t *e)
+{
+    lv_event_code_t code = lv_event_get_code(e);
+    lv_pro_new_page_t page = (lv_pro_new_page_t)(uintptr_t)lv_event_get_user_data(e);
+
+    if (code == LV_EVENT_CLICKED) {
+        lv_pro_new_ui_show_page(page);
+    } else if (code == LV_EVENT_KEY) {
+        uint32_t *key = (uint32_t *)lv_event_get_param(e);
+        if (key != NULL && *key == LV_KEY_ENTER) {
+            lv_pro_new_ui_show_page(page);
+        }
+    }
 }
 
 static void update_bottom_nav(void)
@@ -188,12 +229,12 @@ static void create_topbar(lv_obj_t *root)
     lv_obj_set_size(s_topbar, UI_W, 94);
     lv_obj_set_pos(s_topbar, 0, 0);
 
-    brand = box(s_topbar, 36, 26, 176, 58, 29, lv_color_hex(C_PANEL));
+    brand = box(s_topbar, 36, 26, 196, 58, 29, lv_color_hex(C_PANEL));
     logo = box(brand, 9, 8, 42, 42, 12, lv_color_hex(C_PRIMARY_2));
     style_shadow(logo, 12, LV_OPA_30);
     center_label(logo, "E", &lv_font_montserrat_24, lv_color_white());
-    title = label(brand, "娱乐便携屏", &GENERAL_FONT_SMALL, lv_color_hex(C_INK), 64, 18);
-    lv_obj_set_style_text_font(title, &GENERAL_FONT_MID, 0);
+    title = label_fit(brand, "娱乐便携屏", font_cn_mid(), lv_color_hex(C_INK), 64, 15, 120);
+    lv_label_set_long_mode(title, LV_LABEL_LONG_CLIP);
 
     pill(s_topbar, 804, 26, 226, 52, s_nav_items[s_current_page].icon,
          s_nav_items[s_current_page].full_title, 1);
@@ -217,19 +258,25 @@ static void create_bottom_nav(lv_obj_t *root)
                gap * (LV_PRO_NEW_PAGE_COUNT - 1)) / 2;
     for (i = 0; i < LV_PRO_NEW_PAGE_COUNT; i++) {
         lv_obj_t *btn = lv_btn_create(s_bottom_nav);
-        char text[64];
 
         style_rect(btn, 28, lv_color_hex(C_PANEL));
+        style_focus(btn);
         lv_obj_set_size(btn, item_w, 54);
         lv_obj_set_pos(btn, start_x + i * (item_w + gap), 11);
         lv_obj_set_style_shadow_width(btn, 0, 0);
         lv_obj_set_style_pad_all(btn, 0, 0);
         lv_obj_add_event_cb(btn, nav_event_cb, LV_EVENT_CLICKED, (void *)(uintptr_t)i);
-        snprintf(text, sizeof(text), "%s  %s", s_nav_items[i].icon, s_nav_items[i].title);
-        center_label(btn, text, &GENERAL_FONT_SMALL, lv_color_hex(C_MUTED));
+        lv_obj_add_event_cb(btn, nav_event_cb, LV_EVENT_KEY, (void *)(uintptr_t)i);
+        center_label_fit(btn, s_nav_items[i].title, font_cn_mid(), lv_color_hex(C_MUTED));
         s_nav_buttons[i] = btn;
+        if (s_nav_group != NULL) {
+            lv_group_add_obj(s_nav_group, btn);
+        }
     }
 
+    if (s_nav_group != NULL && s_nav_buttons[LV_PRO_NEW_PAGE_HOME] != NULL) {
+        lv_group_focus_obj(s_nav_buttons[LV_PRO_NEW_PAGE_HOME]);
+    }
     update_bottom_nav();
 }
 
@@ -242,8 +289,7 @@ static void update_shell_visibility(lv_pro_new_page_t page)
         else lv_obj_clear_flag(s_topbar, LV_OBJ_FLAG_HIDDEN);
     }
     if (s_bottom_nav != NULL) {
-        if (media) lv_obj_add_flag(s_bottom_nav, LV_OBJ_FLAG_HIDDEN);
-        else lv_obj_clear_flag(s_bottom_nav, LV_OBJ_FLAG_HIDDEN);
+        lv_obj_clear_flag(s_bottom_nav, LV_OBJ_FLAG_HIDDEN);
     }
     if (s_page_layer != NULL) {
         lv_obj_set_pos(s_page_layer, 0, media ? 0 : 104);
@@ -292,8 +338,8 @@ static void create_home_status_tile(lv_obj_t *parent, lv_coord_t x, const char *
 
     lv_obj_set_style_shadow_width(tile, 0, 0);
     label(tile, icon, &lv_font_montserrat_24, lv_color_hex(C_PRIMARY), 28, 30);
-    label(tile, name, &GENERAL_FONT_SMALL, lv_color_hex(C_MUTED), 78, 21);
-    label(tile, value, &GENERAL_FONT_MID, lv_color_hex(C_INK), 78, 54);
+    label_fit(tile, name, font_cn_small(), lv_color_hex(C_MUTED), 78, 21, 260);
+    label_fit(tile, value, font_cn_mid(), lv_color_hex(C_INK), 78, 54, 260);
 }
 
 static void create_home_page(void)
@@ -324,17 +370,17 @@ static void create_home_page(void)
 
     pill(hero, 24, 26, 124, 46, NULL, "HDMI 在线", 0);
     pill(hero, UI_W - 44 - 136, 26, 112, 46, NULL, "Home_5G", 0);
-    pill(hero, 36, 506, 150, 40, NULL, "高清娱乐便携屏", 0);
+    pill(hero, 36, 506, 150, 40, NULL, "高清便携屏", 0);
 
     title = label(hero, "Mountain Dawn", &lv_font_montserrat_46, lv_color_white(), 36, 550);
     lv_obj_set_style_text_font(title, &lv_font_montserrat_46, 0);
-    label(hero, "沉浸图片轮播 · 背景音乐已开启", &GENERAL_FONT_MID,
-          lv_color_white(), 40, 640);
+    label_fit(hero, "图片轮播 / 背景音乐已开启", font_cn_mid(),
+              lv_color_white(), 40, 640, 760);
 
     time_card = box(s_page_layer, 22, 712, 320, 128, 24, lv_color_hex(C_PANEL));
-    label(time_card, "深圳 · 晴", &GENERAL_FONT_SMALL, lv_color_hex(C_MUTED), 22, 20);
+    label(time_card, "深圳 晴", font_cn_small(), lv_color_hex(C_MUTED), 22, 20);
     label(time_card, "16:57", &lv_font_montserrat_46, lv_color_hex(C_DARK), 22, 48);
-    label(time_card, "5月22日 星期五 · 27°C", &GENERAL_FONT_SMALL, lv_color_hex(C_MUTED), 22, 96);
+    label(time_card, "5月22日 星期五 27C", font_cn_small(), lv_color_hex(C_MUTED), 22, 96);
 
     quick = box(s_page_layer, 356, 712, UI_W - 378, 128, 24, lv_color_hex(C_PANEL));
     create_home_status_tile(quick, 16, "I", "信号源", source);
@@ -360,13 +406,15 @@ static void create_input_page(void)
     lv_obj_set_style_border_color(hdmi, lv_color_hex(C_PRIMARY), 0);
     box(hdmi, 32, 28, 54, 54, 14, lv_color_hex(C_PRIMARY_2));
     label(hdmi, "HDMI", &lv_font_montserrat_32, lv_color_hex(C_INK), 104, 92);
-    label(hdmi, "外接主机 / 电脑 / 游戏机", &GENERAL_FONT_SMALL, lv_color_hex(C_MUTED), 52, 154);
+    label_fit(hdmi, "外接主机 / 电脑 / 游戏机", font_cn_small(),
+              lv_color_hex(C_MUTED), 52, 154, 210);
     label(hdmi, "OK", &lv_font_montserrat_24, lv_color_hex(0x10b981), 232, 30);
 
     usb = btn_box(s_page_layer, 1244, 310, 286, 210, 26, lv_color_hex(C_PANEL));
     box(usb, 32, 28, 54, 54, 14, lv_color_hex(C_PRIMARY_2));
     label(usb, "USB", &lv_font_montserrat_32, lv_color_hex(C_INK), 112, 92);
-    label(usb, "U 盘 / TF 卡媒体播放", &GENERAL_FONT_SMALL, lv_color_hex(C_MUTED), 52, 154);
+    label_fit(usb, "U盘 / TF卡媒体播放", font_cn_small(),
+              lv_color_hex(C_MUTED), 52, 154, 210);
 }
 
 static void cast_card(lv_obj_t *parent, lv_coord_t x, const char *icon,
@@ -376,26 +424,26 @@ static void cast_card(lv_obj_t *parent, lv_coord_t x, const char *icon,
     lv_obj_t *ico = box(card, 30, 30, 64, 64, 16, lv_color_hex(C_PRIMARY_2));
 
     center_label(ico, icon, &lv_font_montserrat_24, lv_color_white());
-    label(card, title, &GENERAL_FONT_BIG, lv_color_hex(C_INK), 250, 130);
-    label(card, desc, &GENERAL_FONT_SMALL, lv_color_hex(C_MUTED), 82, 196);
-    label(card, tags, &GENERAL_FONT_SMALL, lv_color_hex(C_PRIMARY), 42, 366);
+    label_fit(card, title, font_cn_big(), lv_color_hex(C_INK), 228, 130, 260);
+    label_fit(card, desc, font_cn_small(), lv_color_hex(C_MUTED), 82, 196, 470);
+    label_fit(card, tags, font_cn_small(), lv_color_hex(C_PRIMARY), 42, 366, 500);
     label(card, ">", &lv_font_montserrat_24, lv_color_hex(C_MUTED), 570, 360);
 }
 
 static void create_cast_page(void)
 {
-    label(s_page_layer, "无线投屏", &GENERAL_FONT_MID, lv_color_hex(C_PRIMARY), 42, 28);
-    label(s_page_layer, "选择设备类型后按系统提示连接", &GENERAL_FONT_BIG,
-          lv_color_hex(C_INK), 1360, 24);
+    label(s_page_layer, "无线投屏", font_cn_mid(), lv_color_hex(C_PRIMARY), 42, 28);
+    label_fit(s_page_layer, "选择设备类型后按提示连接", font_cn_big(),
+              lv_color_hex(C_INK), 1320, 24, 540);
     cast_card(s_page_layer, 42, "P", "手机投屏",
-              "鸿蒙、Android、iPhone 选择屏幕镜像或无线投屏连接。",
-              "鸿蒙    Android    iOS");
+              "手机选择屏幕镜像或无线投屏连接",
+              "Android / iOS / HarmonyOS");
     cast_card(s_page_layer, 672, "M", "电脑投屏",
-              "Windows 使用 Win + K，Mac 使用隔空播放。",
-              "Windows    Mac    Miracast");
+              "Windows 使用 Win+K Mac 使用隔空播放",
+              "Windows / Mac / Miracast");
     cast_card(s_page_layer, 1302, "2", "P2P 模式",
-              "无需路由器直连设备，双击 MENU 可退出模式。",
-              "热点直连    密码 1234    低延迟");
+              "无需路由器 可直连设备",
+              "热点直连 / 低延迟");
 }
 
 static void create_clock_page(void)
@@ -405,11 +453,11 @@ static void create_clock_page(void)
     lv_obj_t *time;
 
     lv_obj_set_style_shadow_width(bg, 0, 0);
-    label(panel, "实时钟", &GENERAL_FONT_SMALL, lv_color_hex(C_MUTED), 238, 58);
+    label(panel, "实时时钟", font_cn_small(), lv_color_hex(C_MUTED), 224, 58);
     time = label(panel, "16:57", &lv_font_montserrat_46, lv_color_hex(C_DARK), 76, 116);
     lv_obj_set_style_text_font(time, &lv_font_montserrat_46, 0);
     lv_obj_set_style_text_letter_space(time, 2, 0);
-    label(panel, "网络同步 · RTC 离线走时", &GENERAL_FONT_SMALL, lv_color_hex(C_MUTED), 172, 280);
+    label(panel, "网络同步 / RTC 离线走时", font_cn_small(), lv_color_hex(C_MUTED), 150, 280);
     pill(panel, 186, 336, 168, 54, "T", "立即同步", 1);
 }
 
@@ -444,25 +492,27 @@ static void create_wifi_page(void)
     lv_obj_t *side = box(s_page_layer, 30, 0, 370, 840, 28, lv_color_hex(0xf0f3ff));
     lv_obj_t *main = box(s_page_layer, 420, 0, UI_W - 450, 840, 28, lv_color_hex(C_PANEL));
     lv_obj_t *ico;
+    lv_obj_t *line;
 
     lv_obj_set_style_shadow_width(side, 8, 0);
-    label(main, "扫码连接 WiFi", &GENERAL_FONT_MID, lv_color_hex(C_INK), 26, 30);
-    lv_obj_t *line = lv_obj_create(main);
+    label(main, "扫码连接 WiFi", font_cn_mid(), lv_color_hex(C_INK), 26, 30);
+    line = lv_obj_create(main);
     style_rect(line, 0, lv_color_hex(C_LINE));
     lv_obj_set_size(line, UI_W - 520, 2);
     lv_obj_set_pos(line, 26, 78);
 
     ico = box(side, 144, 288, 78, 78, 18, lv_color_hex(C_PRIMARY_2));
     center_label(ico, "W", &lv_font_montserrat_32, lv_color_white());
-    label(side, "当前网络", &GENERAL_FONT_SMALL, lv_color_hex(C_MUTED), 148, 390);
+    label(side, "当前网络", font_cn_small(), lv_color_hex(C_MUTED), 148, 390);
     label(side, "Home_5G", &lv_font_montserrat_32, lv_color_hex(C_INK), 104, 438);
-    label(side, "普通上网模式，支持无线投屏切换", &GENERAL_FONT_SMALL, lv_color_hex(C_MUTED), 68, 500);
+    label_fit(side, "普通上网模式 支持投屏切换", font_cn_small(),
+              lv_color_hex(C_MUTED), 68, 500, 260);
     pill(side, 116, 544, 140, 48, NULL, "进入 P2P", 0);
 
     label(main, "W  Home_5G", &lv_font_montserrat_46, lv_color_hex(C_INK), 620, 246);
     draw_qr(main, 610, 326, 270);
-    label(main, "1. 用手机连接本机 SSID", &GENERAL_FONT_BIG, lv_color_hex(C_INK), 586, 626);
-    label(main, "2. 扫描二维码配置 Wi-Fi", &GENERAL_FONT_BIG, lv_color_hex(C_INK), 586, 670);
+    label(main, "1. 用手机连接本机 SSID", font_cn_big(), lv_color_hex(C_INK), 586, 626);
+    label(main, "2. 扫描二维码配置 WiFi", font_cn_big(), lv_color_hex(C_INK), 586, 670);
 }
 
 static void setting_row(lv_obj_t *parent, lv_coord_t y, const char *icon,
@@ -472,8 +522,8 @@ static void setting_row(lv_obj_t *parent, lv_coord_t y, const char *icon,
 
     lv_obj_set_style_shadow_width(row, 0, 0);
     label(row, icon, &lv_font_montserrat_24, lv_color_hex(C_PRIMARY), 28, 30);
-    label(row, name, &GENERAL_FONT_MID, lv_color_hex(C_INK), 510, 30);
-    label(row, value, &GENERAL_FONT_SMALL, lv_color_hex(C_MUTED), 1050, 33);
+    label_fit(row, name, font_cn_mid(), lv_color_hex(C_INK), 510, 30, 360);
+    label_fit(row, value, font_cn_small(), lv_color_hex(C_MUTED), 1050, 33, 120);
     label(row, ">", &lv_font_montserrat_24, lv_color_hex(C_MUTED), 1160, 30);
 }
 
@@ -484,14 +534,15 @@ static void create_setting_page(void)
     lv_obj_t *ico = box(side, 160, 250, 110, 110, 28, lv_color_hex(C_PRIMARY_2));
 
     center_label(ico, "S", &lv_font_montserrat_46, lv_color_white());
-    label(side, "系统设置", &GENERAL_FONT_BIG, lv_color_hex(C_INK), 126, 410);
-    label(side, "显示、声音、投屏与系统信息", &GENERAL_FONT_SMALL, lv_color_hex(C_MUTED), 100, 500);
+    label(side, "系统设置", font_cn_big(), lv_color_hex(C_INK), 126, 410);
+    label_fit(side, "显示 声音 投屏 系统信息", font_cn_small(),
+              lv_color_hex(C_MUTED), 88, 500, 260);
 
     setting_row(main, 32, "A", "音量大小", "80%");
     setting_row(main, 146, "B", "亮度大小", "100");
     setting_row(main, 260, "Z", "投屏缩放", "全屏");
-    setting_row(main, 374, "L", "语言设置", "简体中文");
-    setting_row(main, 488, "U", "软件升级", "已是最新版");
+    setting_row(main, 374, "L", "语言设置", "中文");
+    setting_row(main, 488, "U", "软件升级", "最新");
     setting_row(main, 602, "I", "软件信息", "V2.1.0");
 }
 
@@ -500,8 +551,8 @@ static void media_control(lv_obj_t *dock, lv_coord_t x, const char *text, int ac
     lv_obj_t *b = btn_box(dock, x, 8, 62, 62, 31,
                           lv_color_hex(active ? 0xeef2ff : C_PANEL));
     lv_obj_set_style_shadow_width(b, 0, 0);
-    center_label(b, text, &lv_font_montserrat_24,
-                 lv_color_hex(active ? C_PRIMARY : C_MUTED));
+    center_label_fit(b, text, &lv_font_montserrat_24,
+                     lv_color_hex(active ? C_PRIMARY : C_MUTED));
 }
 
 static void create_photo_page(void)
@@ -512,16 +563,17 @@ static void create_photo_page(void)
     lv_obj_set_style_shadow_width(bg, 0, 0);
     lv_obj_set_style_bg_grad_color(bg, lv_color_hex(0xffffff), 0);
     lv_obj_set_style_bg_grad_dir(bg, LV_GRAD_DIR_VER, 0);
-    label(bg, "首页", &GENERAL_FONT_SMALL, lv_color_hex(C_INK), 64, 42);
+    label(bg, "首页", font_cn_small(), lv_color_hex(C_INK), 64, 42);
     pill(bg, 922, 30, 150, 54, "P", "图片播放", 1);
     label(bg, "1 / 1", &lv_font_montserrat_24, lv_color_hex(C_INK), 1838, 42);
     label(bg, "Mountain Dawn", &lv_font_montserrat_32, lv_color_hex(C_INK), 50, 136);
-    label(bg, "轮播中 · 无特效 · 背景音乐 开启", &GENERAL_FONT_SMALL, lv_color_hex(C_MUTED), 50, 194);
+    label_fit(bg, "轮播中 / 无特效 / 背景音乐开启", font_cn_small(),
+              lv_color_hex(C_MUTED), 50, 194, 540);
 
-    dock = box(bg, 668, 962, 584, 76, 38, lv_color_hex(C_PANEL));
+    dock = box(bg, 668, 862, 584, 76, 38, lv_color_hex(C_PANEL));
     media_control(dock, 12, "L", 0);
     media_control(dock, 82, "II", 1);
-    media_control(dock, 152, "□", 0);
+    media_control(dock, 152, "S", 0);
     media_control(dock, 222, "<", 0);
     media_control(dock, 292, ">", 0);
     media_control(dock, 362, "*", 0);
@@ -540,14 +592,14 @@ static void create_video_page(void)
     lv_obj_set_style_shadow_width(bg, 0, 0);
     lv_obj_set_style_bg_grad_color(bg, lv_color_hex(0xeef7f5), 0);
     lv_obj_set_style_bg_grad_dir(bg, LV_GRAD_DIR_HOR, 0);
-    label(bg, "首页", &GENERAL_FONT_SMALL, lv_color_hex(C_INK), 64, 42);
+    label(bg, "首页", font_cn_small(), lv_color_hex(C_INK), 64, 42);
     pill(bg, 894, 30, 170, 54, "V", "视频播放", 1);
     label(bg, "00:02:18", &lv_font_montserrat_24, lv_color_hex(C_INK), 1784, 42);
 
     play = btn_box(bg, 904, 464, 108, 108, 54, lv_color_hex(C_PANEL));
     center_label(play, ">", &lv_font_montserrat_46, lv_color_hex(C_PRIMARY));
 
-    progress = box(bg, 288, 860, 1344, 82, 18, lv_color_hex(C_PANEL));
+    progress = box(bg, 288, 760, 1344, 82, 18, lv_color_hex(C_PANEL));
     bar = lv_obj_create(progress);
     style_rect(bar, 3, lv_color_hex(C_LINE));
     lv_obj_set_size(bar, 1280, 6);
@@ -559,10 +611,10 @@ static void create_video_page(void)
     label(progress, "00:02:18 / 00:06:04", &lv_font_montserrat_24,
           lv_color_hex(C_MUTED), 1116, 42);
 
-    dock = box(bg, 728, 964, 464, 76, 38, lv_color_hex(C_PANEL));
+    dock = box(bg, 728, 862, 464, 76, 38, lv_color_hex(C_PANEL));
     media_control(dock, 12, "L", 0);
     media_control(dock, 82, ">", 0);
-    media_control(dock, 152, "□", 0);
+    media_control(dock, 152, "S", 0);
     media_control(dock, 222, "<", 0);
     media_control(dock, 292, ">", 0);
     media_control(dock, 362, "FS", 0);
@@ -597,11 +649,18 @@ void lv_pro_new_ui_show_page(lv_pro_new_page_t page)
     }
 
     if (!page_is_media(page)) {
-        lv_obj_del(s_topbar);
+        if (s_topbar != NULL) {
+            lv_obj_del(s_topbar);
+        }
         s_topbar = NULL;
         create_topbar(lv_pro_new_ui_activity);
         lv_obj_move_foreground(s_topbar);
+    }
+    if (s_bottom_nav != NULL) {
         lv_obj_move_foreground(s_bottom_nav);
+    }
+    if (s_nav_group != NULL && s_nav_buttons[page] != NULL) {
+        lv_group_focus_obj(s_nav_buttons[page]);
     }
     update_bottom_nav();
 }
@@ -617,12 +676,17 @@ void lv_pro_new_ui_init(void)
         lv_obj_del(lv_pro_new_ui_activity);
         lv_pro_new_ui_activity = NULL;
     }
+    if (s_nav_group != NULL) {
+        lv_group_del(s_nav_group);
+        s_nav_group = NULL;
+    }
 
     s_topbar = NULL;
     s_page_layer = NULL;
     s_bottom_nav = NULL;
     memset(s_nav_buttons, 0, sizeof(s_nav_buttons));
     s_current_page = LV_PRO_NEW_PAGE_HOME;
+    s_nav_group = lv_group_create();
 
     lv_pro_new_ui_activity = lv_obj_create(NULL);
     lv_obj_set_size(lv_pro_new_ui_activity, LV_PCT(100), LV_PCT(100));
@@ -642,4 +706,9 @@ void lv_pro_new_ui_init(void)
     create_bottom_nav(lv_pro_new_ui_activity);
     lv_pro_new_ui_show_page(LV_PRO_NEW_PAGE_HOME);
     lv_scr_load(lv_pro_new_ui_activity);
+
+    if (evdev_indev != NULL && s_nav_group != NULL) {
+        lv_indev_set_group(evdev_indev, s_nav_group);
+        lv_group_set_default(s_nav_group);
+    }
 }

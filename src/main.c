@@ -103,13 +103,13 @@ static void install_sig_handler(void)
 int main(int argc, char *argv[]) {
     lv_disp_drv_t disp_drv;
     lv_disp_draw_buf_t disp_buf;
-    uint32_t rotated = LV_DISP_ROT_270;
+    uint32_t rotated = LV_DISP_ROT_NONE;
 
     install_sig_handler();
 
     lv_disp_drv_init(&disp_drv);
 
-    /* Default to landscape (270 degrees) but still allow overriding via argv */
+    /* Default to native landscape. Keep argv override for board bring-up tests. */
 #ifndef USE_SUNXIFB_G2D_ROTATE
     if (rotated != LV_DISP_ROT_NONE)
         disp_drv.sw_rotate = 1;
@@ -137,6 +137,9 @@ int main(int argc, char *argv[]) {
     static uint32_t width, height;
     sunxifb_get_sizes(&width, &height);
     printf("[Main] Screen size: %dx%d\n", width, height);
+    if (width != 1920 || height != 1080) {
+        printf("[Main] Warning: expected 1920x1080 landscape, actual %dx%d\n", width, height);
+    }
     // width = 1920;
     // height = 1080;
     static lv_color_t *buf;
@@ -144,7 +147,7 @@ int main(int argc, char *argv[]) {
     buf = (lv_color_t*) sunxifb_get_buf();
 #else
     buf = (lv_color_t*) sunxifb_alloc(width * height * sizeof(lv_color_t),
-            "mqtt_slideshow");
+            "new_ui");
 #endif
 
     if (buf == NULL) {
