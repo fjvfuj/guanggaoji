@@ -1,0 +1,11 @@
+--- a/openwrt/package/thirdparty/gui/lvgl-8/lv_projector/Makefile
++++ b/openwrt/package/thirdparty/gui/lvgl-8/lv_projector/Makefile
+@@ -185,7 +185,7 @@ define Package/$(PKG_NAME)/install
+ 	$(INSTALL_DIR) $(1)/etc/
+ 	$(INSTALL_DIR) $(1)/usr/share/lv_projector
+ 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/src/$(PKG_NAME) $(1)/usr/bin/
+-	$(CP) $(PKG_BUILD_DIR)/res/* $(1)/usr/share/lv_projector
++	$(INSTALL_DATA) $(PKG_BUILD_DIR)/res/home_bg_mountain.png $(1)/usr/share/lv_projector/
+ 	$(CP) $(AWCAST_LIBS_PATH)/* $(1)/usr/lib/
+ endef
+ 
