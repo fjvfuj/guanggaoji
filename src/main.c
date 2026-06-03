@@ -9,10 +9,12 @@
 #include <ucontext.h>
 #include <dlfcn.h>
 #include <pthread.h>
-#include "NewUI/lv_pro_new_ui.h"
+#include "GuiGuider/generated/gui_guider.h"
+#include "GuiGuider/generated/events_init.h"
 
 lv_indev_t *evdev_indev;
 lv_indev_drv_t indev_drv;
+lv_ui guider_ui;
 
 // LVGL mutex for thread safety (declared extern, defined in lv_pro_res.c)
 extern pthread_mutex_t lvgl_mutex;
@@ -125,7 +127,7 @@ int main(int argc, char *argv[]) {
 #endif
     }
 
-    printf("[Main] LVGL New UI Starting...\n");
+    printf("[Main] LVGL GUI-Guider UI Starting...\n");
 
     /*LVGL init*/
     lv_init();
@@ -175,8 +177,9 @@ int main(int argc, char *argv[]) {
     // Initialize input device
     keypad_int();
 
-    // Initialize the new advertising screen UI shell.
-    lv_pro_new_ui_init();
+    // Initialize the GUI-Guider home UI only; do not start network slideshow here.
+    setup_ui(&guider_ui);
+    events_init(&guider_ui);
 
     printf("[Main] Entering main loop...\n");
 

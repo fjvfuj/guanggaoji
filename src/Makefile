@@ -10,6 +10,7 @@ BIN = lv_projector
 
 #include
 INCLUDES = -I$(LVGL_DIR)/ \
+            -I$(LVGL_DIR)/lvgl \
             -I$(LVGL_DIR)/include \
             -I$(LVGL_DIR)/widget \
             -I$(LVGL_DIR)/Setting \
@@ -17,6 +18,12 @@ INCLUDES = -I$(LVGL_DIR)/ \
             -I$(LVGL_DIR)/System/ota \
             -I$(LVGL_DIR)/Embedded \
             -I$(LVGL_DIR)/NewUI \
+            -I$(LVGL_DIR)/GuiGuider \
+            -I$(LVGL_DIR)/GuiGuider/generated \
+            -I$(LVGL_DIR)/GuiGuider/generated/images \
+            -I$(LVGL_DIR)/GuiGuider/generated/guider_fonts \
+            -I$(LVGL_DIR)/GuiGuider/generated/guider_customer_fonts \
+            -I$(LVGL_DIR)/GuiGuider/custom \
             -I$(LVGL_DIR)/Common \
             -I$(LVGL_DIR)/Common/setting \
             -I$(LVGL_DIR)/Common/language/string \
@@ -38,6 +45,7 @@ SRCDIRS = $(LVGL_DIR)/widget \
         $(LVGL_DIR)/Network \
         $(LVGL_DIR)/Embedded \
         $(LVGL_DIR)/NewUI \
+        $(LVGL_DIR)/GuiGuider \
         $(LVGL_DIR)/Setting \
         $(LVGL_DIR)/Source \
         $(LVGL_DIR)/Media \
