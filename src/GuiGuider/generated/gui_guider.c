@@ -12,6 +12,10 @@
 #include "gui_guider.h"
 #include "widgets_init.h"
 
+#if LV_USE_GUIDER_SIMULATOR && LV_USE_FREEMASTER
+#include "gg_external_data.h"
+#endif
+
 void ui_init_style(lv_style_t * style)
 {
     if (style->prop_cnt > 1)
@@ -26,7 +30,6 @@ void ui_load_scr_animation(lv_ui *ui, lv_obj_t ** new_scr, bool new_scr_del, boo
     lv_obj_t * act_scr = lv_scr_act();
 
 #if LV_USE_GUIDER_SIMULATOR && LV_USE_FREEMASTER
-#include "gg_external_data.h"
     if(auto_del) {
         gg_edata_task_clear(act_scr);
     }
@@ -41,8 +44,8 @@ void ui_load_scr_animation(lv_ui *ui, lv_obj_t ** new_scr, bool new_scr_del, boo
     *old_scr_del = auto_del;
 }
 
-void ui_animation(void * var, uint32_t duration, int32_t delay, int32_t start_value, int32_t end_value, lv_anim_path_cb_t path_cb,
-                  uint32_t repeat_cnt, uint32_t repeat_delay, uint32_t playback_time, uint32_t playback_delay,
+void ui_animation(void * var, int32_t duration, int32_t delay, int32_t start_value, int32_t end_value, lv_anim_path_cb_t path_cb,
+                  uint16_t repeat_cnt, uint32_t repeat_delay, uint32_t playback_time, uint32_t playback_delay,
                   lv_anim_exec_xcb_t exec_cb, lv_anim_start_cb_t start_cb, lv_anim_ready_cb_t ready_cb, lv_anim_deleted_cb_t deleted_cb)
 {
     lv_anim_t anim;
@@ -75,23 +78,12 @@ void init_scr_del_flag(lv_ui *ui)
     ui->screen_del = true;
 }
 
-void setup_bottom_layer(void)
-{
-    /* LVGL 8 in this SDK does not provide lv_layer_bottom(). */
-}
-
 void setup_ui(lv_ui *ui)
 {
-    setup_bottom_layer();
     init_scr_del_flag(ui);
     init_keyboard(ui);
     setup_scr_screen(ui);
     lv_scr_load(ui->screen);
-}
-
-void video_play(lv_ui *ui)
-{
-
 }
 
 void init_keyboard(lv_ui *ui)

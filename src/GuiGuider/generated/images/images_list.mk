@@ -1,1 +1,0 @@
-GEN_CSRCS += _home_bg_mountain_RGB565A8_1827x701.c
