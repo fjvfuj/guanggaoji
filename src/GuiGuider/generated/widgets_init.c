@@ -77,3 +77,29 @@ void clock_count(int *hour, int *min, int *sec)
 #endif
 
 
+extern int screen_digital_clock_1_hour_value;
+extern int screen_digital_clock_1_min_value;
+extern int screen_digital_clock_1_sec_value;
+
+void screen_digital_clock_1_timer(lv_timer_t *timer)
+{
+    clock_count_24(&screen_digital_clock_1_hour_value, &screen_digital_clock_1_min_value, &screen_digital_clock_1_sec_value);
+    if (lv_obj_is_valid(guider_ui.screen_digital_clock_1))
+    {
+        lv_dclock_set_text_fmt(guider_ui.screen_digital_clock_1, "%d:%02d", screen_digital_clock_1_hour_value, screen_digital_clock_1_min_value);
+    }
+}
+
+extern int screen_7_digital_clock_1_hour_value;
+extern int screen_7_digital_clock_1_min_value;
+extern int screen_7_digital_clock_1_sec_value;
+
+void screen_7_digital_clock_1_timer(lv_timer_t *timer)
+{
+    clock_count_24(&screen_7_digital_clock_1_hour_value, &screen_7_digital_clock_1_min_value, &screen_7_digital_clock_1_sec_value);
+    if (lv_obj_is_valid(guider_ui.screen_7_digital_clock_1))
+    {
+        lv_dclock_set_text_fmt(guider_ui.screen_7_digital_clock_1, "%d:%02d", screen_7_digital_clock_1_hour_value, screen_7_digital_clock_1_min_value);
+    }
+}
+
