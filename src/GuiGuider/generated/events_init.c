@@ -105,7 +105,7 @@ static void screen_imgbtn_8_event_handler (lv_event_t *e)
     switch (code) {
     case LV_EVENT_CLICKED:
     {
-        ui_load_scr_animation(&guider_ui, &guider_ui.screen_7, guider_ui.screen_7_del, &guider_ui.screen_del, setup_scr_screen_7, LV_SCR_LOAD_ANIM_NONE, 200, 200, false, false);
+        ui_load_scr_animation(&guider_ui, &guider_ui.screen_5, guider_ui.screen_5_del, &guider_ui.screen_del, setup_scr_screen_5, LV_SCR_LOAD_ANIM_NONE, 200, 200, false, false);
         break;
     }
     default:
@@ -119,7 +119,7 @@ static void screen_imgbtn_9_event_handler (lv_event_t *e)
     switch (code) {
     case LV_EVENT_CLICKED:
     {
-        ui_load_scr_animation(&guider_ui, &guider_ui.screen_5, guider_ui.screen_5_del, &guider_ui.screen_del, setup_scr_screen_5, LV_SCR_LOAD_ANIM_NONE, 200, 200, false, false);
+        ui_load_scr_animation(&guider_ui, &guider_ui.screen_6, guider_ui.screen_6_del, &guider_ui.screen_del, setup_scr_screen_6, LV_SCR_LOAD_ANIM_NONE, 200, 200, false, false);
         break;
     }
     default:
