@@ -62,8 +62,8 @@ void setup_scr_screen_3(lv_ui *ui)
     lv_obj_align(ui->screen_3_screen_3_control_bar_label, LV_ALIGN_CENTER, 0, 0);
     lv_obj_set_style_pad_all(ui->screen_3_screen_3_control_bar, 0, LV_STATE_DEFAULT);
     lv_obj_set_width(ui->screen_3_screen_3_control_bar_label, LV_PCT(100));
-    lv_obj_set_pos(ui->screen_3_screen_3_control_bar, 660, 959);
-    lv_obj_set_size(ui->screen_3_screen_3_control_bar, 631, 78);
+    lv_obj_set_pos(ui->screen_3_screen_3_control_bar, 714, 959);
+    lv_obj_set_size(ui->screen_3_screen_3_control_bar, 526, 78);
 
     //Write style for screen_3_screen_3_control_bar, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
     lv_obj_set_style_bg_opa(ui->screen_3_screen_3_control_bar, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
@@ -85,12 +85,12 @@ void setup_scr_screen_3(lv_ui *ui)
     //Write codes screen_3_screen_3_ctrl_zoom_out
     ui->screen_3_screen_3_ctrl_zoom_out = lv_btn_create(ui->screen_3);
     ui->screen_3_screen_3_ctrl_zoom_out_label = lv_label_create(ui->screen_3_screen_3_ctrl_zoom_out);
-    lv_label_set_text(ui->screen_3_screen_3_ctrl_zoom_out_label, "-");
+    lv_label_set_text(ui->screen_3_screen_3_ctrl_zoom_out_label, "—");
     lv_label_set_long_mode(ui->screen_3_screen_3_ctrl_zoom_out_label, LV_LABEL_LONG_CLIP);
     lv_obj_align(ui->screen_3_screen_3_ctrl_zoom_out_label, LV_ALIGN_CENTER, 0, 0);
     lv_obj_set_style_pad_all(ui->screen_3_screen_3_ctrl_zoom_out, 0, LV_STATE_DEFAULT);
     lv_obj_set_width(ui->screen_3_screen_3_ctrl_zoom_out_label, LV_PCT(100));
-    lv_obj_set_pos(ui->screen_3_screen_3_ctrl_zoom_out, 1143, 971);
+    lv_obj_set_pos(ui->screen_3_screen_3_ctrl_zoom_out, 1087, 971);
     lv_obj_set_size(ui->screen_3_screen_3_ctrl_zoom_out, 52, 52);
 
     //Write style for screen_3_screen_3_ctrl_zoom_out, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
@@ -100,7 +100,7 @@ void setup_scr_screen_3(lv_ui *ui)
     lv_obj_set_style_border_width(ui->screen_3_screen_3_ctrl_zoom_out, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_radius(ui->screen_3_screen_3_ctrl_zoom_out, 26, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_shadow_width(ui->screen_3_screen_3_ctrl_zoom_out, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_color(ui->screen_3_screen_3_ctrl_zoom_out, lv_color_hex(0x627089), LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_color(ui->screen_3_screen_3_ctrl_zoom_out, lv_color_hex(0x000000), LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(ui->screen_3_screen_3_ctrl_zoom_out, &lv_font_SourceHanSerifSC_Regular_16, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui->screen_3_screen_3_ctrl_zoom_out, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_align(ui->screen_3_screen_3_ctrl_zoom_out, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN|LV_STATE_DEFAULT);
@@ -113,7 +113,7 @@ void setup_scr_screen_3(lv_ui *ui)
     lv_obj_align(ui->screen_3_screen_3_ctrl_zoom_in_label, LV_ALIGN_CENTER, 0, 0);
     lv_obj_set_style_pad_all(ui->screen_3_screen_3_ctrl_zoom_in, 0, LV_STATE_DEFAULT);
     lv_obj_set_width(ui->screen_3_screen_3_ctrl_zoom_in_label, LV_PCT(100));
-    lv_obj_set_pos(ui->screen_3_screen_3_ctrl_zoom_in, 1078, 971);
+    lv_obj_set_pos(ui->screen_3_screen_3_ctrl_zoom_in, 1016, 971);
     lv_obj_set_size(ui->screen_3_screen_3_ctrl_zoom_in, 52, 52);
 
     //Write style for screen_3_screen_3_ctrl_zoom_in, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
@@ -123,43 +123,20 @@ void setup_scr_screen_3(lv_ui *ui)
     lv_obj_set_style_border_width(ui->screen_3_screen_3_ctrl_zoom_in, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_radius(ui->screen_3_screen_3_ctrl_zoom_in, 26, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_shadow_width(ui->screen_3_screen_3_ctrl_zoom_in, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_color(ui->screen_3_screen_3_ctrl_zoom_in, lv_color_hex(0x627089), LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_font(ui->screen_3_screen_3_ctrl_zoom_in, &lv_font_SourceHanSerifSC_Regular_16, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_color(ui->screen_3_screen_3_ctrl_zoom_in, lv_color_hex(0x000000), LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui->screen_3_screen_3_ctrl_zoom_in, &lv_font_SourceHanSerifSC_Regular_27, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui->screen_3_screen_3_ctrl_zoom_in, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_align(ui->screen_3_screen_3_ctrl_zoom_in, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN|LV_STATE_DEFAULT);
-
-    //Write codes screen_3_screen_3_ctrl_effect
-    ui->screen_3_screen_3_ctrl_effect = lv_btn_create(ui->screen_3);
-    ui->screen_3_screen_3_ctrl_effect_label = lv_label_create(ui->screen_3_screen_3_ctrl_effect);
-    lv_label_set_text(ui->screen_3_screen_3_ctrl_effect_label, "FX");
-    lv_label_set_long_mode(ui->screen_3_screen_3_ctrl_effect_label, LV_LABEL_LONG_CLIP);
-    lv_obj_align(ui->screen_3_screen_3_ctrl_effect_label, LV_ALIGN_CENTER, 0, 0);
-    lv_obj_set_style_pad_all(ui->screen_3_screen_3_ctrl_effect, 0, LV_STATE_DEFAULT);
-    lv_obj_set_width(ui->screen_3_screen_3_ctrl_effect_label, LV_PCT(100));
-    lv_obj_set_pos(ui->screen_3_screen_3_ctrl_effect, 1013, 971);
-    lv_obj_set_size(ui->screen_3_screen_3_ctrl_effect, 52, 52);
-
-    //Write style for screen_3_screen_3_ctrl_effect, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
-    lv_obj_set_style_bg_opa(ui->screen_3_screen_3_ctrl_effect, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_color(ui->screen_3_screen_3_ctrl_effect, lv_color_hex(0xffffff), LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_grad_dir(ui->screen_3_screen_3_ctrl_effect, LV_GRAD_DIR_NONE, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_border_width(ui->screen_3_screen_3_ctrl_effect, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_radius(ui->screen_3_screen_3_ctrl_effect, 26, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_shadow_width(ui->screen_3_screen_3_ctrl_effect, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_color(ui->screen_3_screen_3_ctrl_effect, lv_color_hex(0x627089), LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_font(ui->screen_3_screen_3_ctrl_effect, &lv_font_SourceHanSerifSC_Regular_16, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_opa(ui->screen_3_screen_3_ctrl_effect, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_align(ui->screen_3_screen_3_ctrl_effect, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN|LV_STATE_DEFAULT);
 
     //Write codes screen_3_screen_3_ctrl_next
     ui->screen_3_screen_3_ctrl_next = lv_btn_create(ui->screen_3);
     ui->screen_3_screen_3_ctrl_next_label = lv_label_create(ui->screen_3_screen_3_ctrl_next);
-    lv_label_set_text(ui->screen_3_screen_3_ctrl_next_label, "NEXT");
+    lv_label_set_text(ui->screen_3_screen_3_ctrl_next_label, "" LV_SYMBOL_NEXT " ");
     lv_label_set_long_mode(ui->screen_3_screen_3_ctrl_next_label, LV_LABEL_LONG_CLIP);
     lv_obj_align(ui->screen_3_screen_3_ctrl_next_label, LV_ALIGN_CENTER, 0, 0);
     lv_obj_set_style_pad_all(ui->screen_3_screen_3_ctrl_next, 0, LV_STATE_DEFAULT);
     lv_obj_set_width(ui->screen_3_screen_3_ctrl_next_label, LV_PCT(100));
-    lv_obj_set_pos(ui->screen_3_screen_3_ctrl_next, 948, 971);
+    lv_obj_set_pos(ui->screen_3_screen_3_ctrl_next, 946, 971);
     lv_obj_set_size(ui->screen_3_screen_3_ctrl_next, 52, 52);
 
     //Write style for screen_3_screen_3_ctrl_next, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
@@ -169,7 +146,7 @@ void setup_scr_screen_3(lv_ui *ui)
     lv_obj_set_style_border_width(ui->screen_3_screen_3_ctrl_next, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_radius(ui->screen_3_screen_3_ctrl_next, 26, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_shadow_width(ui->screen_3_screen_3_ctrl_next, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_color(ui->screen_3_screen_3_ctrl_next, lv_color_hex(0x627089), LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_color(ui->screen_3_screen_3_ctrl_next, lv_color_hex(0x000000), LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(ui->screen_3_screen_3_ctrl_next, &lv_font_SourceHanSerifSC_Regular_16, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui->screen_3_screen_3_ctrl_next, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_align(ui->screen_3_screen_3_ctrl_next, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN|LV_STATE_DEFAULT);
@@ -177,7 +154,7 @@ void setup_scr_screen_3(lv_ui *ui)
     //Write codes screen_3_screen_3_ctrl_prev
     ui->screen_3_screen_3_ctrl_prev = lv_btn_create(ui->screen_3);
     ui->screen_3_screen_3_ctrl_prev_label = lv_label_create(ui->screen_3_screen_3_ctrl_prev);
-    lv_label_set_text(ui->screen_3_screen_3_ctrl_prev_label, "PREV");
+    lv_label_set_text(ui->screen_3_screen_3_ctrl_prev_label, "" LV_SYMBOL_PREV " ");
     lv_label_set_long_mode(ui->screen_3_screen_3_ctrl_prev_label, LV_LABEL_LONG_CLIP);
     lv_obj_align(ui->screen_3_screen_3_ctrl_prev_label, LV_ALIGN_CENTER, 0, 0);
     lv_obj_set_style_pad_all(ui->screen_3_screen_3_ctrl_prev, 0, LV_STATE_DEFAULT);
@@ -192,7 +169,7 @@ void setup_scr_screen_3(lv_ui *ui)
     lv_obj_set_style_border_width(ui->screen_3_screen_3_ctrl_prev, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_radius(ui->screen_3_screen_3_ctrl_prev, 26, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_shadow_width(ui->screen_3_screen_3_ctrl_prev, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_color(ui->screen_3_screen_3_ctrl_prev, lv_color_hex(0x627089), LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_color(ui->screen_3_screen_3_ctrl_prev, lv_color_hex(0x000000), LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(ui->screen_3_screen_3_ctrl_prev, &lv_font_SourceHanSerifSC_Regular_16, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui->screen_3_screen_3_ctrl_prev, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_align(ui->screen_3_screen_3_ctrl_prev, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN|LV_STATE_DEFAULT);
@@ -271,6 +248,7 @@ void setup_scr_screen_3(lv_ui *ui)
     ui->screen_3_screen_3_page_pill_label = lv_label_create(ui->screen_3_screen_3_page_pill);
     lv_label_set_text(ui->screen_3_screen_3_page_pill_label, "图片");
     lv_label_set_long_mode(ui->screen_3_screen_3_page_pill_label, LV_LABEL_LONG_CLIP);
+    lv_obj_set_style_text_font(ui->screen_3_screen_3_page_pill_label, &lv_font_SourceHanSerifSC_Regular_22, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_align(ui->screen_3_screen_3_page_pill_label, LV_ALIGN_CENTER, 0, 0);
     lv_obj_set_style_pad_all(ui->screen_3_screen_3_page_pill, 0, LV_STATE_DEFAULT);
     lv_obj_set_width(ui->screen_3_screen_3_page_pill_label, LV_PCT(100));
@@ -302,6 +280,7 @@ void setup_scr_screen_3(lv_ui *ui)
     ui->screen_3_screen_3_home_btn_label = lv_label_create(ui->screen_3_screen_3_home_btn);
     lv_label_set_text(ui->screen_3_screen_3_home_btn_label, "首页");
     lv_label_set_long_mode(ui->screen_3_screen_3_home_btn_label, LV_LABEL_LONG_CLIP);
+    lv_obj_set_style_text_font(ui->screen_3_screen_3_home_btn_label, &lv_font_SourceHanSerifSC_Regular_22, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_align(ui->screen_3_screen_3_home_btn_label, LV_ALIGN_CENTER, 0, 0);
     lv_obj_set_style_pad_all(ui->screen_3_screen_3_home_btn, 0, LV_STATE_DEFAULT);
     lv_obj_set_width(ui->screen_3_screen_3_home_btn_label, LV_PCT(100));
@@ -348,33 +327,10 @@ void setup_scr_screen_3(lv_ui *ui)
     lv_obj_set_style_pad_left(ui->screen_3_screen_3_cursor_mark, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_shadow_width(ui->screen_3_screen_3_cursor_mark, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
 
-    //Write codes screen_3_screen_3_ctrl_list
-    ui->screen_3_screen_3_ctrl_list = lv_btn_create(ui->screen_3);
-    ui->screen_3_screen_3_ctrl_list_label = lv_label_create(ui->screen_3_screen_3_ctrl_list);
-    lv_label_set_text(ui->screen_3_screen_3_ctrl_list_label, "LIST");
-    lv_label_set_long_mode(ui->screen_3_screen_3_ctrl_list_label, LV_LABEL_LONG_CLIP);
-    lv_obj_align(ui->screen_3_screen_3_ctrl_list_label, LV_ALIGN_CENTER, 0, 0);
-    lv_obj_set_style_pad_all(ui->screen_3_screen_3_ctrl_list, 0, LV_STATE_DEFAULT);
-    lv_obj_set_width(ui->screen_3_screen_3_ctrl_list_label, LV_PCT(100));
-    lv_obj_set_pos(ui->screen_3_screen_3_ctrl_list, 690, 971);
-    lv_obj_set_size(ui->screen_3_screen_3_ctrl_list, 52, 52);
-
-    //Write style for screen_3_screen_3_ctrl_list, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
-    lv_obj_set_style_bg_opa(ui->screen_3_screen_3_ctrl_list, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_color(ui->screen_3_screen_3_ctrl_list, lv_color_hex(0xffffff), LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_grad_dir(ui->screen_3_screen_3_ctrl_list, LV_GRAD_DIR_NONE, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_border_width(ui->screen_3_screen_3_ctrl_list, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_radius(ui->screen_3_screen_3_ctrl_list, 26, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_shadow_width(ui->screen_3_screen_3_ctrl_list, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_color(ui->screen_3_screen_3_ctrl_list, lv_color_hex(0x627089), LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_font(ui->screen_3_screen_3_ctrl_list, &lv_font_SourceHanSerifSC_Regular_16, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_opa(ui->screen_3_screen_3_ctrl_list, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_align(ui->screen_3_screen_3_ctrl_list, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN|LV_STATE_DEFAULT);
-
     //Write codes screen_3_screen_3_ctrl_pause
     ui->screen_3_screen_3_ctrl_pause = lv_btn_create(ui->screen_3);
     ui->screen_3_screen_3_ctrl_pause_label = lv_label_create(ui->screen_3_screen_3_ctrl_pause);
-    lv_label_set_text(ui->screen_3_screen_3_ctrl_pause_label, "PAUSE");
+    lv_label_set_text(ui->screen_3_screen_3_ctrl_pause_label, "" LV_SYMBOL_PAUSE " ");
     lv_label_set_long_mode(ui->screen_3_screen_3_ctrl_pause_label, LV_LABEL_LONG_CLIP);
     lv_obj_align(ui->screen_3_screen_3_ctrl_pause_label, LV_ALIGN_CENTER, 0, 0);
     lv_obj_set_style_pad_all(ui->screen_3_screen_3_ctrl_pause, 0, LV_STATE_DEFAULT);
@@ -384,7 +340,7 @@ void setup_scr_screen_3(lv_ui *ui)
 
     //Write style for screen_3_screen_3_ctrl_pause, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
     lv_obj_set_style_bg_opa(ui->screen_3_screen_3_ctrl_pause, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_color(ui->screen_3_screen_3_ctrl_pause, lv_color_hex(0xf0efff), LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_color(ui->screen_3_screen_3_ctrl_pause, lv_color_hex(0xffffff), LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_bg_grad_dir(ui->screen_3_screen_3_ctrl_pause, LV_GRAD_DIR_NONE, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_border_width(ui->screen_3_screen_3_ctrl_pause, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_radius(ui->screen_3_screen_3_ctrl_pause, 26, LV_PART_MAIN|LV_STATE_DEFAULT);
@@ -394,7 +350,7 @@ void setup_scr_screen_3(lv_ui *ui)
     lv_obj_set_style_shadow_spread(ui->screen_3_screen_3_ctrl_pause, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_shadow_ofs_x(ui->screen_3_screen_3_ctrl_pause, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_shadow_ofs_y(ui->screen_3_screen_3_ctrl_pause, 3, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_color(ui->screen_3_screen_3_ctrl_pause, lv_color_hex(0x6b72ff), LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_color(ui->screen_3_screen_3_ctrl_pause, lv_color_hex(0x000000), LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(ui->screen_3_screen_3_ctrl_pause, &lv_font_SourceHanSerifSC_Regular_16, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui->screen_3_screen_3_ctrl_pause, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_align(ui->screen_3_screen_3_ctrl_pause, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN|LV_STATE_DEFAULT);
@@ -402,7 +358,7 @@ void setup_scr_screen_3(lv_ui *ui)
     //Write codes screen_3_screen_3_ctrl_stop
     ui->screen_3_screen_3_ctrl_stop = lv_btn_create(ui->screen_3);
     ui->screen_3_screen_3_ctrl_stop_label = lv_label_create(ui->screen_3_screen_3_ctrl_stop);
-    lv_label_set_text(ui->screen_3_screen_3_ctrl_stop_label, "STOP");
+    lv_label_set_text(ui->screen_3_screen_3_ctrl_stop_label, "" LV_SYMBOL_PLAY " ");
     lv_label_set_long_mode(ui->screen_3_screen_3_ctrl_stop_label, LV_LABEL_LONG_CLIP);
     lv_obj_align(ui->screen_3_screen_3_ctrl_stop_label, LV_ALIGN_CENTER, 0, 0);
     lv_obj_set_style_pad_all(ui->screen_3_screen_3_ctrl_stop, 0, LV_STATE_DEFAULT);
@@ -417,7 +373,7 @@ void setup_scr_screen_3(lv_ui *ui)
     lv_obj_set_style_border_width(ui->screen_3_screen_3_ctrl_stop, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_radius(ui->screen_3_screen_3_ctrl_stop, 26, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_shadow_width(ui->screen_3_screen_3_ctrl_stop, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_color(ui->screen_3_screen_3_ctrl_stop, lv_color_hex(0x627089), LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_color(ui->screen_3_screen_3_ctrl_stop, lv_color_hex(0x000000), LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(ui->screen_3_screen_3_ctrl_stop, &lv_font_SourceHanSerifSC_Regular_16, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui->screen_3_screen_3_ctrl_stop, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_align(ui->screen_3_screen_3_ctrl_stop, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN|LV_STATE_DEFAULT);
@@ -425,17 +381,17 @@ void setup_scr_screen_3(lv_ui *ui)
     //Write codes screen_3_screen_3_ctrl_music
     ui->screen_3_screen_3_ctrl_music = lv_btn_create(ui->screen_3);
     ui->screen_3_screen_3_ctrl_music_label = lv_label_create(ui->screen_3_screen_3_ctrl_music);
-    lv_label_set_text(ui->screen_3_screen_3_ctrl_music_label, "M");
+    lv_label_set_text(ui->screen_3_screen_3_ctrl_music_label, "" LV_SYMBOL_AUDIO " ");
     lv_label_set_long_mode(ui->screen_3_screen_3_ctrl_music_label, LV_LABEL_LONG_CLIP);
     lv_obj_align(ui->screen_3_screen_3_ctrl_music_label, LV_ALIGN_CENTER, 0, 0);
     lv_obj_set_style_pad_all(ui->screen_3_screen_3_ctrl_music, 0, LV_STATE_DEFAULT);
     lv_obj_set_width(ui->screen_3_screen_3_ctrl_music_label, LV_PCT(100));
-    lv_obj_set_pos(ui->screen_3_screen_3_ctrl_music, 1208, 971);
+    lv_obj_set_pos(ui->screen_3_screen_3_ctrl_music, 1164, 971);
     lv_obj_set_size(ui->screen_3_screen_3_ctrl_music, 52, 52);
 
     //Write style for screen_3_screen_3_ctrl_music, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
     lv_obj_set_style_bg_opa(ui->screen_3_screen_3_ctrl_music, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_color(ui->screen_3_screen_3_ctrl_music, lv_color_hex(0xf0efff), LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_color(ui->screen_3_screen_3_ctrl_music, lv_color_hex(0xffffff), LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_bg_grad_dir(ui->screen_3_screen_3_ctrl_music, LV_GRAD_DIR_NONE, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_border_width(ui->screen_3_screen_3_ctrl_music, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_radius(ui->screen_3_screen_3_ctrl_music, 26, LV_PART_MAIN|LV_STATE_DEFAULT);
@@ -445,7 +401,7 @@ void setup_scr_screen_3(lv_ui *ui)
     lv_obj_set_style_shadow_spread(ui->screen_3_screen_3_ctrl_music, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_shadow_ofs_x(ui->screen_3_screen_3_ctrl_music, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_shadow_ofs_y(ui->screen_3_screen_3_ctrl_music, 3, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_color(ui->screen_3_screen_3_ctrl_music, lv_color_hex(0x6b72ff), LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_color(ui->screen_3_screen_3_ctrl_music, lv_color_hex(0x000000), LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(ui->screen_3_screen_3_ctrl_music, &lv_font_SourceHanSerifSC_Regular_16, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui->screen_3_screen_3_ctrl_music, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_align(ui->screen_3_screen_3_ctrl_music, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN|LV_STATE_DEFAULT);

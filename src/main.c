@@ -11,11 +11,11 @@
 #include <pthread.h>
 #include "GuiGuider/generated/gui_guider.h"
 #include "GuiGuider/generated/events_init.h"
+#include "GuiGuider/custom/gui_guider_keypad.h"
 
 lv_indev_t *evdev_indev;
 lv_indev_drv_t indev_drv;
 lv_ui guider_ui;
-static lv_group_t *nav_group;
 
 // LVGL mutex for thread safety (declared extern, defined in lv_pro_res.c)
 extern pthread_mutex_t lvgl_mutex;
@@ -27,32 +27,6 @@ static void keypad_int()
     indev_drv.type = LV_INDEV_TYPE_KEYPAD;
     indev_drv.read_cb = evdev_read_ex;
     evdev_indev = lv_indev_drv_register(&indev_drv);
-}
-
-static void gui_guider_bind_keypad_group(lv_ui *ui)
-{
-    if (!evdev_indev || !ui) {
-        return;
-    }
-
-    nav_group = lv_group_create();
-    if (!nav_group) {
-        printf("[Main] Failed to create GUI-Guider nav group\n");
-        return;
-    }
-
-    lv_group_add_obj(nav_group, ui->screen_imgbtn_11); /* home */
-    lv_group_add_obj(nav_group, ui->screen_imgbtn_4);  /* input */
-    lv_group_add_obj(nav_group, ui->screen_imgbtn_5);  /* cast */
-    lv_group_add_obj(nav_group, ui->screen_imgbtn_6);  /* image */
-    lv_group_add_obj(nav_group, ui->screen_imgbtn_7);  /* video */
-    lv_group_add_obj(nav_group, ui->screen_imgbtn_8);  /* clock */
-    lv_group_add_obj(nav_group, ui->screen_imgbtn_9);  /* network */
-    lv_group_add_obj(nav_group, ui->screen_imgbtn_10); /* settings */
-
-    lv_indev_set_group(evdev_indev, nav_group);
-    lv_group_focus_obj(ui->screen_imgbtn_11);
-    printf("[Main] GUI-Guider keypad group bound\n");
 }
 
 void print_stack(ucontext_t *uc) {
@@ -206,7 +180,7 @@ int main(int argc, char *argv[]) {
 
     // Initialize the GUI-Guider home UI only; do not start network slideshow here.
     setup_ui(&guider_ui);
-    gui_guider_bind_keypad_group(&guider_ui);
+    gui_guider_keypad_init(&guider_ui, evdev_indev);
     events_init(&guider_ui);
 
     printf("[Main] Entering main loop...\n");
@@ -215,6 +189,7 @@ int main(int argc, char *argv[]) {
     while (1) {
         pthread_mutex_lock(&lvgl_mutex);
         lv_task_handler();
+        gui_guider_keypad_poll();
         pthread_mutex_unlock(&lvgl_mutex);
         usleep(10000); // 10ms
     }
