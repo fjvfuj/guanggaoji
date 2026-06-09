@@ -377,6 +377,7 @@ static uint32_t gui_guider_key_map(uint32_t key)
 {
     if (is_next_key(key)) {
         update_key_debug(key, "next");
+        s_last_menu_tick = 0;
         if (adjust_current_value(ADJUST_STEP)) {
             return KEY_RESERVED;
         }
@@ -386,6 +387,7 @@ static uint32_t gui_guider_key_map(uint32_t key)
 
     if (is_prev_key(key)) {
         update_key_debug(key, "prev");
+        s_last_menu_tick = 0;
         if (adjust_current_value(-ADJUST_STEP)) {
             return KEY_RESERVED;
         }
@@ -395,6 +397,12 @@ static uint32_t gui_guider_key_map(uint32_t key)
 
     if (is_menu_key(key)) {
         update_key_debug(key, "menu");
+        if (lv_scr_act() == s_ui->screen) {
+            s_last_menu_tick = 0;
+            activate_focused_obj();
+            return KEY_RESERVED;
+        }
+
         uint32_t now = lv_tick_get();
         if (s_last_menu_tick != 0 && (now - s_last_menu_tick) <= MENU_DOUBLE_CLICK_MS) {
             s_last_menu_tick = 0;

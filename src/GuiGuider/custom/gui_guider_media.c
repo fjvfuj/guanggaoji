@@ -10,6 +10,8 @@
 #define GUI_GUIDER_MEDIA_MAX_IMAGES 16
 #define GUI_GUIDER_MEDIA_PATH_MAX 256
 #define GUI_GUIDER_MEDIA_SLIDE_MS 5000
+#define GUI_GUIDER_MEDIA_FALLBACK_W 960U
+#define GUI_GUIDER_MEDIA_FALLBACK_H 540U
 
 static lv_ui *s_ui;
 static lv_obj_t *s_home_parent;
@@ -88,20 +90,32 @@ static void load_media_paths(void)
     printf("[GUI-Guider] media images loaded: %u\n", (unsigned)s_path_count);
 }
 
-static uint16_t calc_cover_zoom(const char *src, lv_coord_t target_w, lv_coord_t target_h)
+static void get_image_size(const char *src, uint32_t *out_w, uint32_t *out_h)
 {
     lv_img_header_t header;
+
+    if (src == NULL || lv_img_decoder_get_info(src, &header) != LV_RES_OK ||
+        header.w == 0 || header.h == 0) {
+        *out_w = GUI_GUIDER_MEDIA_FALLBACK_W;
+        *out_h = GUI_GUIDER_MEDIA_FALLBACK_H;
+        return;
+    }
+
+    *out_w = header.w;
+    *out_h = header.h;
+}
+
+static uint16_t calc_cover_zoom(const char *src, lv_coord_t target_w, lv_coord_t target_h,
+                                uint32_t *out_src_w, uint32_t *out_src_h)
+{
     uint32_t zoom_w;
     uint32_t zoom_h;
     uint32_t zoom;
 
-    if (src == NULL || lv_img_decoder_get_info(src, &header) != LV_RES_OK ||
-        header.w == 0 || header.h == 0) {
-        return 256;
-    }
+    get_image_size(src, out_src_w, out_src_h);
 
-    zoom_w = ((uint32_t)target_w * 256U + header.w - 1U) / header.w;
-    zoom_h = ((uint32_t)target_h * 256U + header.h - 1U) / header.h;
+    zoom_w = ((uint32_t)target_w * 256U + *out_src_w - 1U) / *out_src_w;
+    zoom_h = ((uint32_t)target_h * 256U + *out_src_h - 1U) / *out_src_h;
     zoom = zoom_w > zoom_h ? zoom_w : zoom_h;
 
     if (zoom < 16U) {
@@ -116,15 +130,19 @@ static uint16_t calc_cover_zoom(const char *src, lv_coord_t target_w, lv_coord_t
 static void apply_image(lv_obj_t *img, lv_coord_t target_w, lv_coord_t target_h)
 {
     const char *src;
+    uint32_t src_w;
+    uint32_t src_h;
+    uint16_t zoom;
 
     if (img == NULL || s_path_count == 0) {
         return;
     }
 
     src = s_paths[s_path_index % s_path_count];
+    zoom = calc_cover_zoom(src, target_w, target_h, &src_w, &src_h);
     lv_img_set_src(img, src);
-    lv_img_set_pivot(img, target_w / 2, target_h / 2);
-    lv_img_set_zoom(img, calc_cover_zoom(src, target_w, target_h));
+    lv_img_set_pivot(img, src_w / 2, src_h / 2);
+    lv_img_set_zoom(img, zoom);
     lv_obj_center(img);
 }
 
@@ -153,6 +171,9 @@ static void bind_home_media(void)
         s_home_img = create_media_image(s_home_parent);
         lv_obj_clear_flag(s_home_parent, LV_OBJ_FLAG_SCROLLABLE);
         lv_obj_set_style_clip_corner(s_home_parent, true, LV_PART_MAIN);
+        lv_obj_set_style_bg_img_src(s_home_parent, NULL, LV_PART_MAIN);
+        lv_obj_set_style_bg_img_opa(s_home_parent, 0, LV_PART_MAIN);
+        lv_obj_set_style_bg_color(s_home_parent, lv_color_hex(0x111827), LV_PART_MAIN);
     }
 
     w = lv_obj_get_width(s_home_parent);
