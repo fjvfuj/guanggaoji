@@ -8,12 +8,14 @@
 #define MENU_DOUBLE_CLICK_MS 450
 #define ADJUST_STEP 5
 #define GUI_GUIDER_LV_KEY_MENU 12
+#define GUI_GUIDER_KEY_DEBUG 1
 
 static lv_ui *s_ui;
 static lv_indev_t *s_indev;
 static lv_group_t *s_group;
 static lv_obj_t *s_bound_screen;
 static lv_obj_t *s_edit_obj;
+static lv_obj_t *s_debug_label;
 static uint32_t s_last_menu_tick;
 
 static void bind_current_screen(void);
@@ -39,6 +41,30 @@ static bool is_menu_key(uint32_t key)
 static bool is_obj(lv_obj_t *a, lv_obj_t *b)
 {
     return a != NULL && a == b;
+}
+
+static void update_key_debug(uint32_t key, const char *action)
+{
+#if GUI_GUIDER_KEY_DEBUG
+    if (!s_debug_label) {
+        s_debug_label = lv_label_create(lv_layer_top());
+        lv_obj_set_style_bg_color(s_debug_label, lv_color_hex(0x111827), LV_PART_MAIN);
+        lv_obj_set_style_bg_opa(s_debug_label, LV_OPA_80, LV_PART_MAIN);
+        lv_obj_set_style_text_color(s_debug_label, lv_color_hex(0xffffff), LV_PART_MAIN);
+        lv_obj_set_style_pad_left(s_debug_label, 10, LV_PART_MAIN);
+        lv_obj_set_style_pad_right(s_debug_label, 10, LV_PART_MAIN);
+        lv_obj_set_style_pad_top(s_debug_label, 6, LV_PART_MAIN);
+        lv_obj_set_style_pad_bottom(s_debug_label, 6, LV_PART_MAIN);
+        lv_obj_set_style_radius(s_debug_label, 6, LV_PART_MAIN);
+        lv_obj_align(s_debug_label, LV_ALIGN_TOP_LEFT, 20, 20);
+    }
+
+    lv_label_set_text_fmt(s_debug_label, "key=%u action=%s", (unsigned)key, action);
+    lv_obj_move_foreground(s_debug_label);
+#else
+    (void)key;
+    (void)action;
+#endif
 }
 
 static bool is_adjust_obj(lv_obj_t *obj)
@@ -348,6 +374,7 @@ static void bind_current_screen(void)
 static uint32_t gui_guider_key_map(uint32_t key)
 {
     if (is_next_key(key)) {
+        update_key_debug(key, "next");
         if (adjust_current_value(ADJUST_STEP)) {
             return KEY_RESERVED;
         }
@@ -356,6 +383,7 @@ static uint32_t gui_guider_key_map(uint32_t key)
     }
 
     if (is_prev_key(key)) {
+        update_key_debug(key, "prev");
         if (adjust_current_value(-ADJUST_STEP)) {
             return KEY_RESERVED;
         }
@@ -364,6 +392,7 @@ static uint32_t gui_guider_key_map(uint32_t key)
     }
 
     if (is_menu_key(key)) {
+        update_key_debug(key, "menu");
         uint32_t now = lv_tick_get();
         if (s_last_menu_tick != 0 && (now - s_last_menu_tick) <= MENU_DOUBLE_CLICK_MS) {
             s_last_menu_tick = 0;
@@ -376,6 +405,7 @@ static uint32_t gui_guider_key_map(uint32_t key)
         return KEY_RESERVED;
     }
 
+    update_key_debug(key, "pass");
     return key;
 }
 
