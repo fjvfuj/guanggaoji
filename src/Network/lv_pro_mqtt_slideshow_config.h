@@ -84,6 +84,18 @@
 #define IMAGE_DIR "/usr/share/lv_projector/mqtt_images/"
 #endif
 
+#ifndef MQTT_VIDEO_DIR
+#define MQTT_VIDEO_DIR "/usr/share/lv_projector/mqtt_videos/"
+#endif
+
+#ifndef DEFAULT_MEDIA_IMAGE_DIR
+#define DEFAULT_MEDIA_IMAGE_DIR "/usr/share/lv_projector/default_media/images/"
+#endif
+
+#ifndef DEFAULT_MEDIA_VIDEO_DIR
+#define DEFAULT_MEDIA_VIDEO_DIR "/usr/share/lv_projector/default_media/videos/"
+#endif
+
 #ifndef STATE_FILE
 #define STATE_FILE "/usr/share/lv_projector/mqtt_images/slideshow_state.txt"
 #endif

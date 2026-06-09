@@ -136,6 +136,22 @@ static int is_regular_nonzero_file(const char *path)
     return 1;
 }
 
+static void join_dir_file(char *out, size_t out_size, const char *dir, const char *name)
+{
+    size_t len;
+
+    if (out == NULL || out_size == 0) return;
+    if (dir == NULL) dir = "";
+    if (name == NULL) name = "";
+
+    len = strlen(dir);
+    if (len > 0 && dir[len - 1] == '/') {
+        snprintf(out, out_size, "%s%s", dir, name);
+    } else {
+        snprintf(out, out_size, "%s/%s", dir, name);
+    }
+}
+
 static void cleanup_stale_tmp_files(void)
 {
     DIR *dir;
@@ -205,11 +221,23 @@ int mqtt_slideshow_store_init(void)
         MQTT_SLIDESHOW_ERR("mkdir_p failed: %s", IMAGE_DIR);
         return -1;
     }
+    if (mkdir_p(MQTT_VIDEO_DIR) != 0) {
+        MQTT_SLIDESHOW_ERR("mkdir_p failed: %s", MQTT_VIDEO_DIR);
+        return -1;
+    }
+    if (mkdir_p(DEFAULT_MEDIA_IMAGE_DIR) != 0) {
+        MQTT_SLIDESHOW_ERR("mkdir_p failed: %s", DEFAULT_MEDIA_IMAGE_DIR);
+    }
+    if (mkdir_p(DEFAULT_MEDIA_VIDEO_DIR) != 0) {
+        MQTT_SLIDESHOW_ERR("mkdir_p failed: %s", DEFAULT_MEDIA_VIDEO_DIR);
+    }
 
     fsync_dir_path(IMAGE_DIR);
+    fsync_dir_path(MQTT_VIDEO_DIR);
     cleanup_stale_tmp_files();
 
     MQTT_SLIDESHOW_LOG("image dir ready: %s", IMAGE_DIR);
+    MQTT_SLIDESHOW_LOG("default media image dir ready: %s", DEFAULT_MEDIA_IMAGE_DIR);
     return 0;
 }
 
@@ -220,7 +248,7 @@ void mqtt_slideshow_store_deinit(void)
     pthread_mutex_unlock(&s_store_lock);
 }
 
-int mqtt_slideshow_store_scan_local(mqtt_slideshow_image_list_t *out)
+static int scan_image_dir(const char *dir_path, mqtt_slideshow_image_list_t *out, bool remove_bad_files)
 {
     DIR *dir;
     struct dirent *entry;
@@ -231,11 +259,12 @@ int mqtt_slideshow_store_scan_local(mqtt_slideshow_image_list_t *out)
     if (out == NULL) return -1;
     memset(out, 0, sizeof(*out));
 
-    cleanup_stale_tmp_files();
+    if (dir_path == NULL || dir_path[0] == '\0') return -1;
+    if (strcmp(dir_path, IMAGE_DIR) == 0) cleanup_stale_tmp_files();
 
-    dir = opendir(IMAGE_DIR);
+    dir = opendir(dir_path);
     if (dir == NULL) {
-        MQTT_SLIDESHOW_LOG("Image directory does not exist yet: %s", IMAGE_DIR);
+        MQTT_SLIDESHOW_LOG("Image directory does not exist yet: %s", dir_path);
         return 0;
     }
 
@@ -246,12 +275,14 @@ int mqtt_slideshow_store_scan_local(mqtt_slideshow_image_list_t *out)
 
         if (!mqtt_slideshow_store_is_valid_image_name(entry->d_name)) continue;
 
-        snprintf(filepath, sizeof(filepath), "%s%s", IMAGE_DIR, entry->d_name);
+        join_dir_file(filepath, sizeof(filepath), dir_path, entry->d_name);
 
         if (!is_regular_nonzero_file(filepath)) {
             MQTT_SLIDESHOW_LOG("skip bad image file: %s", filepath);
-            remove(filepath);
-            fsync_dir_path(IMAGE_DIR);
+            if (remove_bad_files) {
+                remove(filepath);
+                fsync_dir_path(dir_path);
+            }
             continue;
         }
 
@@ -268,14 +299,42 @@ int mqtt_slideshow_store_scan_local(mqtt_slideshow_image_list_t *out)
     }
 
     for (i = 0; i < count; i++) {
-        snprintf(out->items[i].path, sizeof(out->items[i].path), "A:%s%s", IMAGE_DIR, names[i]);
+        char filepath[MQTT_SLIDESHOW_MAX_URL_LEN];
+
+        join_dir_file(filepath, sizeof(filepath), dir_path, names[i]);
+        snprintf(out->items[i].path, sizeof(out->items[i].path), "A:%s", filepath);
         free(names[i]);
     }
 
     out->count = count;
 
-    MQTT_SLIDESHOW_LOG("Local image scan complete, count=%d", count);
+    MQTT_SLIDESHOW_LOG("Image scan complete, dir=%s count=%d", dir_path, count);
     return count;
+}
+
+int mqtt_slideshow_store_scan_local(mqtt_slideshow_image_list_t *out)
+{
+    mqtt_slideshow_image_list_t remote;
+    int count;
+
+    if (out == NULL) return -1;
+
+    count = scan_image_dir(IMAGE_DIR, &remote, true);
+    if (count > 0 && remote.count > 0) {
+        *out = remote;
+        MQTT_SLIDESHOW_LOG("Using MQTT image directory: %s", IMAGE_DIR);
+        return remote.count;
+    }
+
+    count = scan_image_dir(DEFAULT_MEDIA_IMAGE_DIR, out, false);
+    if (count > 0 && out->count > 0) {
+        MQTT_SLIDESHOW_LOG("Using default offline image directory: %s", DEFAULT_MEDIA_IMAGE_DIR);
+        return out->count;
+    }
+
+    memset(out, 0, sizeof(*out));
+    MQTT_SLIDESHOW_LOG("No MQTT or default offline images found");
+    return 0;
 }
 
 int mqtt_slideshow_store_replace_active(const mqtt_slideshow_image_list_t *list)
