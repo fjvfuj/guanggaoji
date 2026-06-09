@@ -1,5 +1,6 @@
 #include "gui_guider_keypad.h"
 
+#include "gui_guider_media.h"
 #include "GuiGuider/generated/events_init.h"
 #include "lv_drivers/indev/evdev.h"
 #include <linux/input.h>
@@ -422,4 +423,5 @@ void gui_guider_keypad_init(lv_ui *ui, lv_indev_t *indev)
 void gui_guider_keypad_poll(void)
 {
     bind_current_screen();
+    gui_guider_media_poll();
 }

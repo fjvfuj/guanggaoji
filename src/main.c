@@ -12,6 +12,7 @@
 #include "GuiGuider/generated/gui_guider.h"
 #include "GuiGuider/generated/events_init.h"
 #include "GuiGuider/custom/gui_guider_keypad.h"
+#include "GuiGuider/custom/gui_guider_media.h"
 
 lv_indev_t *evdev_indev;
 lv_indev_drv_t indev_drv;
@@ -182,6 +183,7 @@ int main(int argc, char *argv[]) {
     setup_ui(&guider_ui);
     gui_guider_keypad_init(&guider_ui, evdev_indev);
     events_init(&guider_ui);
+    gui_guider_media_init(&guider_ui);
 
     printf("[Main] Entering main loop...\n");
 
