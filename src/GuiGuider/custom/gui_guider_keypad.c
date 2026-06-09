@@ -7,7 +7,6 @@
 #include <stdio.h>
 
 #define MENU_DOUBLE_CLICK_MS 450
-#define MENU_PAGE_ENTER_GUARD_MS 1200
 #define ADJUST_STEP 5
 #define GUI_GUIDER_LV_KEY_MENU 12
 #define GUI_GUIDER_KEY_DEBUG 1
@@ -19,7 +18,6 @@ static lv_obj_t *s_bound_screen;
 static lv_obj_t *s_edit_obj;
 static lv_obj_t *s_debug_label;
 static uint32_t s_last_menu_tick;
-static uint32_t s_last_screen_bind_tick;
 
 static void bind_current_screen(void);
 
@@ -372,8 +370,6 @@ static void bind_current_screen(void)
 
     s_bound_screen = active;
     s_edit_obj = NULL;
-    s_last_menu_tick = 0;
-    s_last_screen_bind_tick = lv_tick_get();
     printf("[GUI-Guider] keypad group rebound, obj_count=%u\n", (unsigned)lv_group_get_obj_count(s_group));
 }
 
@@ -401,20 +397,13 @@ static uint32_t gui_guider_key_map(uint32_t key)
 
     if (is_menu_key(key)) {
         update_key_debug(key, "menu");
-        uint32_t now = lv_tick_get();
         if (lv_scr_act() == s_ui->screen) {
             s_last_menu_tick = 0;
             activate_focused_obj();
             return KEY_RESERVED;
         }
 
-        if (s_last_screen_bind_tick != 0 &&
-            (now - s_last_screen_bind_tick) <= MENU_PAGE_ENTER_GUARD_MS) {
-            update_key_debug(key, "menu_guard");
-            s_last_menu_tick = 0;
-            return KEY_RESERVED;
-        }
-
+        uint32_t now = lv_tick_get();
         if (s_last_menu_tick != 0 && (now - s_last_menu_tick) <= MENU_DOUBLE_CLICK_MS) {
             s_last_menu_tick = 0;
             load_home_screen();

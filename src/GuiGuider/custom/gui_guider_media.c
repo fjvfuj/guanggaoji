@@ -202,6 +202,22 @@ static void bind_photo_media(void)
     apply_image(s_photo_img, w, h);
 }
 
+static void bind_active_media(void)
+{
+    lv_obj_t *active;
+
+    if (s_ui == NULL) {
+        return;
+    }
+
+    active = lv_scr_act();
+    if (active == s_ui->screen) {
+        bind_home_media();
+    } else if (active == s_ui->screen_3) {
+        bind_photo_media();
+    }
+}
+
 static void timer_cb(lv_timer_t *timer)
 {
     (void)timer;
@@ -210,8 +226,7 @@ static void timer_cb(lv_timer_t *timer)
         s_path_index = (s_path_index + 1) % s_path_count;
     }
 
-    bind_home_media();
-    bind_photo_media();
+    bind_active_media();
 }
 
 void gui_guider_media_init(lv_ui *ui)
@@ -223,7 +238,7 @@ void gui_guider_media_init(lv_ui *ui)
     s_photo_img = NULL;
 
     load_media_paths();
-    bind_home_media();
+    bind_active_media();
 
     if (s_timer == NULL) {
         s_timer = lv_timer_create(timer_cb, GUI_GUIDER_MEDIA_SLIDE_MS, NULL);
@@ -232,6 +247,5 @@ void gui_guider_media_init(lv_ui *ui)
 
 void gui_guider_media_poll(void)
 {
-    bind_home_media();
-    bind_photo_media();
+    bind_active_media();
 }
