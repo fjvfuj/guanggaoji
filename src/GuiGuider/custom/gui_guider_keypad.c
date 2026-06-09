@@ -7,6 +7,7 @@
 
 #define MENU_DOUBLE_CLICK_MS 450
 #define ADJUST_STEP 5
+#define GUI_GUIDER_LV_KEY_MENU 12
 
 static lv_ui *s_ui;
 static lv_indev_t *s_indev;
@@ -16,6 +17,22 @@ static lv_obj_t *s_edit_obj;
 static uint32_t s_last_menu_tick;
 
 static void bind_current_screen(void);
+
+static bool is_next_key(uint32_t key)
+{
+    return key == KEY_UP || key == KEY_NEXT || key == LV_KEY_UP || key == LV_KEY_NEXT;
+}
+
+static bool is_prev_key(uint32_t key)
+{
+    return key == KEY_DOWN || key == KEY_PREVIOUS || key == LV_KEY_DOWN || key == LV_KEY_PREV;
+}
+
+static bool is_menu_key(uint32_t key)
+{
+    return key == KEY_MENU || key == KEY_OK || key == KEY_ENTER ||
+           key == GUI_GUIDER_LV_KEY_MENU || key == LV_KEY_ENTER;
+}
 
 static bool is_obj(lv_obj_t *a, lv_obj_t *b)
 {
@@ -230,6 +247,24 @@ static void activate_focused_obj(void)
     printf("[GUI-Guider] activate focused object\n");
 }
 
+static void focus_next_obj(void)
+{
+    if (!s_group) {
+        return;
+    }
+
+    lv_group_focus_next(s_group);
+}
+
+static void focus_prev_obj(void)
+{
+    if (!s_group) {
+        return;
+    }
+
+    lv_group_focus_prev(s_group);
+}
+
 static void bind_home_group(void)
 {
     add_obj_to_group(s_ui->screen_img_3);  /* home */
@@ -310,21 +345,23 @@ static void bind_current_screen(void)
 
 static uint32_t gui_guider_key_map(uint32_t key)
 {
-    if (key == KEY_UP) {
+    if (is_next_key(key)) {
         if (adjust_current_value(ADJUST_STEP)) {
             return KEY_RESERVED;
         }
-        return KEY_NEXT;
+        focus_next_obj();
+        return KEY_RESERVED;
     }
 
-    if (key == KEY_DOWN) {
+    if (is_prev_key(key)) {
         if (adjust_current_value(-ADJUST_STEP)) {
             return KEY_RESERVED;
         }
-        return KEY_PREVIOUS;
+        focus_prev_obj();
+        return KEY_RESERVED;
     }
 
-    if (key == KEY_MENU) {
+    if (is_menu_key(key)) {
         uint32_t now = lv_tick_get();
         if (s_last_menu_tick != 0 && (now - s_last_menu_tick) <= MENU_DOUBLE_CLICK_MS) {
             s_last_menu_tick = 0;
