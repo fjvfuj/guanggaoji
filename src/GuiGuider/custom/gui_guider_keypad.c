@@ -20,7 +20,8 @@ static void bind_current_screen(void);
 
 static bool is_next_key(uint32_t key)
 {
-    return key == KEY_UP || key == KEY_NEXT || key == LV_KEY_UP || key == LV_KEY_NEXT;
+    return key == KEY_UP || key == KEY_RIGHT || key == KEY_NEXT ||
+           key == LV_KEY_UP || key == LV_KEY_RIGHT || key == LV_KEY_NEXT;
 }
 
 static bool is_prev_key(uint32_t key)
@@ -31,7 +32,8 @@ static bool is_prev_key(uint32_t key)
 static bool is_menu_key(uint32_t key)
 {
     return key == KEY_MENU || key == KEY_OK || key == KEY_ENTER ||
-           key == GUI_GUIDER_LV_KEY_MENU || key == LV_KEY_ENTER;
+           key == KEY_LEFT || key == GUI_GUIDER_LV_KEY_MENU ||
+           key == LV_KEY_ENTER || key == LV_KEY_LEFT;
 }
 
 static bool is_obj(lv_obj_t *a, lv_obj_t *b)
