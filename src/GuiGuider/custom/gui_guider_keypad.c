@@ -205,6 +205,31 @@ static void add_clickable_children(lv_obj_t *parent)
     }
 }
 
+static void activate_focused_obj(void)
+{
+    if (!s_group) {
+        return;
+    }
+
+    lv_obj_t *focused = lv_group_get_focused(s_group);
+    if (!focused) {
+        return;
+    }
+
+    if (is_adjust_obj(focused)) {
+        if (s_edit_obj == focused) {
+            set_edit_obj(NULL);
+            printf("[GUI-Guider] leave adjust mode\n");
+        } else {
+            set_edit_obj(focused);
+        }
+        return;
+    }
+
+    lv_event_send(focused, LV_EVENT_CLICKED, NULL);
+    printf("[GUI-Guider] activate focused object\n");
+}
+
 static void bind_home_group(void)
 {
     add_obj_to_group(s_ui->screen_img_3);  /* home */
@@ -308,7 +333,8 @@ static uint32_t gui_guider_key_map(uint32_t key)
         }
 
         s_last_menu_tick = now;
-        return KEY_OK;
+        activate_focused_obj();
+        return KEY_RESERVED;
     }
 
     return key;
