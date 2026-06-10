@@ -124,7 +124,8 @@ static bool handle_menu_key(uint32_t key)
     }
 
     s_last_menu_tick = now;
-    update_key_debug(key, "menu-wait");
+    update_key_debug(key, "menu-activate");
+    activate_focused_obj();
     return true;
 }
 
