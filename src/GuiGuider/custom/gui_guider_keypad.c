@@ -25,6 +25,7 @@ static uint32_t s_last_menu_tick;
 static void bind_current_screen(void);
 static void load_home_screen(void);
 static void activate_focused_obj(void);
+static void make_non_focusable(lv_obj_t *obj);
 
 static bool is_next_key(uint32_t key)
 {
@@ -338,9 +339,18 @@ static void add_obj_to_group(lv_obj_t *obj)
 
     lv_obj_add_flag(obj, LV_OBJ_FLAG_CLICKABLE);
     lv_obj_set_style_outline_width(obj, 4, LV_PART_MAIN | LV_STATE_FOCUS_KEY);
-    lv_obj_set_style_outline_color(obj, lv_color_hex(0x574bff), LV_PART_MAIN | LV_STATE_FOCUS_KEY);
+    lv_obj_set_style_outline_color(obj, lv_color_hex(0x7c6dff), LV_PART_MAIN | LV_STATE_FOCUS_KEY);
     lv_obj_set_style_outline_opa(obj, LV_OPA_COVER, LV_PART_MAIN | LV_STATE_FOCUS_KEY);
-    lv_obj_set_style_outline_pad(obj, 4, LV_PART_MAIN | LV_STATE_FOCUS_KEY);
+    lv_obj_set_style_outline_pad(obj, 7, LV_PART_MAIN | LV_STATE_FOCUS_KEY);
+    lv_obj_set_style_shadow_width(obj, 18, LV_PART_MAIN | LV_STATE_FOCUS_KEY);
+    lv_obj_set_style_shadow_color(obj, lv_color_hex(0x7c6dff), LV_PART_MAIN | LV_STATE_FOCUS_KEY);
+    lv_obj_set_style_shadow_opa(obj, LV_OPA_50, LV_PART_MAIN | LV_STATE_FOCUS_KEY);
+    lv_obj_set_style_shadow_spread(obj, 1, LV_PART_MAIN | LV_STATE_FOCUS_KEY);
+    lv_obj_set_style_shadow_ofs_x(obj, 0, LV_PART_MAIN | LV_STATE_FOCUS_KEY);
+    lv_obj_set_style_shadow_ofs_y(obj, 0, LV_PART_MAIN | LV_STATE_FOCUS_KEY);
+    lv_obj_set_style_text_color(obj, lv_color_hex(0x574bff), LV_PART_MAIN | LV_STATE_FOCUS_KEY);
+    lv_obj_set_style_img_recolor(obj, lv_color_hex(0x574bff), LV_PART_MAIN | LV_STATE_FOCUS_KEY);
+    lv_obj_set_style_img_recolor_opa(obj, LV_OPA_30, LV_PART_MAIN | LV_STATE_FOCUS_KEY);
     lv_obj_add_event_cb(obj, keypad_event_cb, LV_EVENT_KEY, NULL);
     lv_group_add_obj(s_group, obj);
 }
@@ -520,6 +530,11 @@ static void focus_prev_obj(void)
 
 static void bind_home_group(void)
 {
+    if (s_ui->screen_cont_1) {
+        lv_obj_set_style_border_color(s_ui->screen_cont_1, lv_color_hex(0xffffff), LV_PART_MAIN);
+        lv_obj_set_style_border_opa(s_ui->screen_cont_1, LV_OPA_COVER, LV_PART_MAIN);
+    }
+
     add_obj_to_group(s_ui->screen_img_3);  /* home */
     add_obj_to_group(s_ui->screen_img_4);  /* input */
     add_obj_to_group(s_ui->screen_img_5);  /* cast */
@@ -542,6 +557,68 @@ static void bind_page_nav_group(lv_obj_t *home, lv_obj_t *input, lv_obj_t *cast,
     add_obj_to_group(clock);
     add_obj_to_group(network);
     add_obj_to_group(setting);
+}
+
+static void bind_input_group(void)
+{
+    bind_page_nav_group(s_ui->screen_1_img_20, s_ui->screen_1_img_19,
+                        s_ui->screen_1_img_18, s_ui->screen_1_img_17,
+                        s_ui->screen_1_img_16, s_ui->screen_1_img_15,
+                        s_ui->screen_1_img_14, s_ui->screen_1_img_13);
+    add_obj_to_group(s_ui->screen_1_img_10);
+    add_obj_to_group(s_ui->screen_1_img_11);
+    add_obj_to_group(s_ui->screen_1_img_12);
+}
+
+static void bind_cast_group(void)
+{
+    bind_page_nav_group(s_ui->screen_2_img_18, s_ui->screen_2_img_17,
+                        s_ui->screen_2_img_16, s_ui->screen_2_img_15,
+                        s_ui->screen_2_img_14, s_ui->screen_2_img_13,
+                        s_ui->screen_2_img_12, s_ui->screen_2_img_11);
+    add_obj_to_group(s_ui->screen_2_img_8);
+    add_obj_to_group(s_ui->screen_2_img_9);
+    add_obj_to_group(s_ui->screen_2_img_10);
+}
+
+static void bind_network_group(void)
+{
+    bind_page_nav_group(s_ui->screen_5_img_18, s_ui->screen_5_img_17,
+                        s_ui->screen_5_img_16, s_ui->screen_5_img_15,
+                        s_ui->screen_5_img_14, s_ui->screen_5_img_13,
+                        s_ui->screen_5_img_12, s_ui->screen_5_img_11);
+    add_obj_to_group(s_ui->screen_5_img_8);
+    add_obj_to_group(s_ui->screen_5_img_9);
+    add_obj_to_group(s_ui->screen_5_img_10);
+}
+
+static void bind_clock_group(void)
+{
+    bind_page_nav_group(s_ui->screen_7_img_18, s_ui->screen_7_img_17,
+                        s_ui->screen_7_img_16, s_ui->screen_7_img_15,
+                        s_ui->screen_7_img_14, s_ui->screen_7_img_13,
+                        s_ui->screen_7_img_12, s_ui->screen_7_img_11);
+    add_obj_to_group(s_ui->screen_7_img_8);
+    add_obj_to_group(s_ui->screen_7_img_9);
+    add_obj_to_group(s_ui->screen_7_img_10);
+}
+
+static void bind_video_group(void)
+{
+    make_non_focusable(s_ui->screen_4_screen_4_left_image_hint);
+    make_non_focusable(s_ui->screen_4_screen_4_bg_placeholder);
+    make_non_focusable(s_ui->screen_4_screen_4_progress_panel);
+    make_non_focusable(s_ui->screen_4_screen_4_page_pill);
+
+    add_obj_to_group(s_ui->screen_4_screen_4_home_btn);
+    add_obj_to_group(s_ui->screen_4_btn_8);
+    add_obj_to_group(s_ui->screen_4_btn_7);
+    add_obj_to_group(s_ui->screen_4_btn_6);
+    add_obj_to_group(s_ui->screen_4_btn_5);
+    add_obj_to_group(s_ui->screen_4_btn_4);
+    add_obj_to_group(s_ui->screen_4_btn_3);
+    add_obj_to_group(s_ui->screen_4_btn_2);
+    add_obj_to_group(s_ui->screen_4_btn_1);
 }
 
 static void bind_setting_group(void)
@@ -631,10 +708,20 @@ static void bind_current_screen(void)
 
     if (active == s_ui->screen) {
         bind_home_group();
+    } else if (active == s_ui->screen_1) {
+        bind_input_group();
+    } else if (active == s_ui->screen_2) {
+        bind_cast_group();
     } else if (active == s_ui->screen_3) {
         bind_photo_group();
+    } else if (active == s_ui->screen_4) {
+        bind_video_group();
+    } else if (active == s_ui->screen_5) {
+        bind_network_group();
     } else if (active == s_ui->screen_6) {
         bind_setting_group();
+    } else if (active == s_ui->screen_7) {
+        bind_clock_group();
     } else {
         add_clickable_children(active);
     }
