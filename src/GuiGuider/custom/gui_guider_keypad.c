@@ -338,19 +338,19 @@ static void add_obj_to_group(lv_obj_t *obj)
     }
 
     lv_obj_add_flag(obj, LV_OBJ_FLAG_CLICKABLE);
-    lv_obj_set_style_outline_width(obj, 4, LV_PART_MAIN | LV_STATE_FOCUS_KEY);
-    lv_obj_set_style_outline_color(obj, lv_color_hex(0x7c6dff), LV_PART_MAIN | LV_STATE_FOCUS_KEY);
-    lv_obj_set_style_outline_opa(obj, LV_OPA_COVER, LV_PART_MAIN | LV_STATE_FOCUS_KEY);
-    lv_obj_set_style_outline_pad(obj, 7, LV_PART_MAIN | LV_STATE_FOCUS_KEY);
-    lv_obj_set_style_shadow_width(obj, 18, LV_PART_MAIN | LV_STATE_FOCUS_KEY);
-    lv_obj_set_style_shadow_color(obj, lv_color_hex(0x7c6dff), LV_PART_MAIN | LV_STATE_FOCUS_KEY);
-    lv_obj_set_style_shadow_opa(obj, LV_OPA_50, LV_PART_MAIN | LV_STATE_FOCUS_KEY);
-    lv_obj_set_style_shadow_spread(obj, 1, LV_PART_MAIN | LV_STATE_FOCUS_KEY);
+    lv_obj_set_style_outline_width(obj, 2, LV_PART_MAIN | LV_STATE_FOCUS_KEY);
+    lv_obj_set_style_outline_color(obj, lv_color_hex(0xbec4ff), LV_PART_MAIN | LV_STATE_FOCUS_KEY);
+    lv_obj_set_style_outline_opa(obj, LV_OPA_60, LV_PART_MAIN | LV_STATE_FOCUS_KEY);
+    lv_obj_set_style_outline_pad(obj, 4, LV_PART_MAIN | LV_STATE_FOCUS_KEY);
+    lv_obj_set_style_shadow_width(obj, 8, LV_PART_MAIN | LV_STATE_FOCUS_KEY);
+    lv_obj_set_style_shadow_color(obj, lv_color_hex(0xbec4ff), LV_PART_MAIN | LV_STATE_FOCUS_KEY);
+    lv_obj_set_style_shadow_opa(obj, LV_OPA_20, LV_PART_MAIN | LV_STATE_FOCUS_KEY);
+    lv_obj_set_style_shadow_spread(obj, 0, LV_PART_MAIN | LV_STATE_FOCUS_KEY);
     lv_obj_set_style_shadow_ofs_x(obj, 0, LV_PART_MAIN | LV_STATE_FOCUS_KEY);
     lv_obj_set_style_shadow_ofs_y(obj, 0, LV_PART_MAIN | LV_STATE_FOCUS_KEY);
     lv_obj_set_style_text_color(obj, lv_color_hex(0x574bff), LV_PART_MAIN | LV_STATE_FOCUS_KEY);
-    lv_obj_set_style_img_recolor(obj, lv_color_hex(0x574bff), LV_PART_MAIN | LV_STATE_FOCUS_KEY);
-    lv_obj_set_style_img_recolor_opa(obj, LV_OPA_30, LV_PART_MAIN | LV_STATE_FOCUS_KEY);
+    lv_obj_set_style_img_recolor(obj, lv_color_hex(0x6b63ff), LV_PART_MAIN | LV_STATE_FOCUS_KEY);
+    lv_obj_set_style_img_recolor_opa(obj, LV_OPA_10, LV_PART_MAIN | LV_STATE_FOCUS_KEY);
     lv_obj_add_event_cb(obj, keypad_event_cb, LV_EVENT_KEY, NULL);
     lv_group_add_obj(s_group, obj);
 }
@@ -609,9 +609,9 @@ static void bind_video_group(void)
     make_non_focusable(s_ui->screen_4_screen_4_bg_placeholder);
     make_non_focusable(s_ui->screen_4_screen_4_progress_panel);
     make_non_focusable(s_ui->screen_4_screen_4_page_pill);
+    make_non_focusable(s_ui->screen_4_btn_8);
 
     add_obj_to_group(s_ui->screen_4_screen_4_home_btn);
-    add_obj_to_group(s_ui->screen_4_btn_8);
     add_obj_to_group(s_ui->screen_4_btn_7);
     add_obj_to_group(s_ui->screen_4_btn_6);
     add_obj_to_group(s_ui->screen_4_btn_5);
@@ -623,13 +623,14 @@ static void bind_video_group(void)
 
 static void bind_setting_group(void)
 {
+    make_non_focusable(s_ui->screen_6_btn_6);
+
     add_obj_to_group(s_ui->screen_6_screen_6_row_volume_bg);
     add_obj_to_group(s_ui->screen_6_screen_6_row_brightness_bg);
     add_obj_to_group(s_ui->screen_6_screen_6_row_scale_bg);
     add_obj_to_group(s_ui->screen_6_screen_6_row_language_bg);
     add_obj_to_group(s_ui->screen_6_screen_6_row_upgrade_bg);
     add_obj_to_group(s_ui->screen_6_screen_6_row_info_bg);
-    add_obj_to_group(s_ui->screen_6_btn_6);
     bind_page_nav_group(s_ui->screen_6_img_18, s_ui->screen_6_img_17,
                         s_ui->screen_6_img_16, s_ui->screen_6_img_15,
                         s_ui->screen_6_img_14, s_ui->screen_6_img_13,
