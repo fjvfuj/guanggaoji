@@ -6,6 +6,7 @@
 #include <strings.h>
 
 static emb_remote_status_t emb_remote_status;
+static char emb_remote_last_photo_dir[256];
 
 static int is_supported_image_name(const char *name)
 {
@@ -94,6 +95,12 @@ emb_result_t emb_remote_select_photo_dir(char *out_dir, size_t out_size)
 
     snprintf(out_dir, out_size, "%s", selected);
     emb_remote_status.last_error[0] = '\0';
+
+    if (strcmp(selected, emb_remote_last_photo_dir) != 0) {
+        snprintf(emb_remote_last_photo_dir, sizeof(emb_remote_last_photo_dir), "%s", selected);
+        printf("[Embedded] photo media source: %s\n", selected);
+    }
+
     return EMB_OK;
 }
 

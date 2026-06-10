@@ -47,14 +47,67 @@ static int is_supported_image_name(const char *name)
            strcasecmp(ext, ".bmp") == 0;
 }
 
+static int get_decodable_image_size(const char *src, uint32_t *out_w, uint32_t *out_h)
+{
+    lv_img_header_t header;
+
+    if (src == NULL || lv_img_decoder_get_info(src, &header) != LV_RES_OK ||
+        header.w == 0 || header.h == 0) {
+        return 0;
+    }
+
+    if (out_w != NULL) {
+        *out_w = header.w;
+    }
+
+    if (out_h != NULL) {
+        *out_h = header.h;
+    }
+
+    return 1;
+}
+
+static void insert_media_path_sorted(const char *path)
+{
+    uint32_t insert_at;
+    uint32_t move;
+
+    if (path == NULL || s_path_count >= GUI_GUIDER_MEDIA_MAX_IMAGES) {
+        return;
+    }
+
+    insert_at = s_path_count;
+    while (insert_at > 0 && strcasecmp(path, s_paths[insert_at - 1]) < 0) {
+        insert_at--;
+    }
+
+    for (move = s_path_count; move > insert_at; move--) {
+        snprintf(s_paths[move], sizeof(s_paths[move]), "%s", s_paths[move - 1]);
+    }
+
+    snprintf(s_paths[insert_at], sizeof(s_paths[insert_at]), "%s", path);
+    s_path_count++;
+}
+
 static void add_media_path(const char *dir, const char *name)
 {
+    char path[GUI_GUIDER_MEDIA_PATH_MAX];
+    uint32_t img_w = 0;
+    uint32_t img_h = 0;
+
     if (s_path_count >= GUI_GUIDER_MEDIA_MAX_IMAGES) {
         return;
     }
 
-    snprintf(s_paths[s_path_count], sizeof(s_paths[s_path_count]), "A:%s/%s", dir, name);
-    s_path_count++;
+    snprintf(path, sizeof(path), "A:%s/%s", dir, name);
+    if (!get_decodable_image_size(path, &img_w, &img_h)) {
+        printf("[GUI-Guider] skip undecodable image: %s\n", path);
+        return;
+    }
+
+    insert_media_path_sorted(path);
+    printf("[GUI-Guider] add media image: %s (%ux%u)\n",
+           path, (unsigned)img_w, (unsigned)img_h);
 }
 
 static void scan_media_dir(const char *dir)
@@ -141,21 +194,6 @@ static int reload_media_paths_if_needed(void)
     return 0;
 }
 
-static void get_image_size(const char *src, uint32_t *out_w, uint32_t *out_h)
-{
-    lv_img_header_t header;
-
-    if (src == NULL || lv_img_decoder_get_info(src, &header) != LV_RES_OK ||
-        header.w == 0 || header.h == 0) {
-        *out_w = GUI_GUIDER_MEDIA_FALLBACK_W;
-        *out_h = GUI_GUIDER_MEDIA_FALLBACK_H;
-        return;
-    }
-
-    *out_w = header.w;
-    *out_h = header.h;
-}
-
 static uint16_t calc_cover_zoom(const char *src, lv_coord_t target_w, lv_coord_t target_h,
                                 uint32_t *out_src_w, uint32_t *out_src_h)
 {
@@ -163,7 +201,10 @@ static uint16_t calc_cover_zoom(const char *src, lv_coord_t target_w, lv_coord_t
     uint32_t zoom_h;
     uint32_t zoom;
 
-    get_image_size(src, out_src_w, out_src_h);
+    if (!get_decodable_image_size(src, out_src_w, out_src_h)) {
+        *out_src_w = GUI_GUIDER_MEDIA_FALLBACK_W;
+        *out_src_h = GUI_GUIDER_MEDIA_FALLBACK_H;
+    }
 
     zoom_w = ((uint32_t)target_w * 256U + *out_src_w - 1U) / *out_src_w;
     zoom_h = ((uint32_t)target_h * 256U + *out_src_h - 1U) / *out_src_h;
