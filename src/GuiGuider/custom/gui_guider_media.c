@@ -27,6 +27,7 @@ static uint32_t s_path_index;
 static uint32_t s_home_applied_index;
 static uint32_t s_photo_applied_index;
 static lv_obj_t *s_last_active_screen;
+static bool s_slideshow_paused;
 
 static int is_supported_image_name(const char *name)
 {
@@ -135,6 +136,22 @@ static void reset_applied_images(void)
     s_photo_applied_index = UINT32_MAX;
 }
 
+static void update_photo_count(void)
+{
+    if (s_ui == NULL || s_ui->screen_3_screen_3_count == NULL) {
+        return;
+    }
+
+    if (s_path_count == 0) {
+        lv_label_set_text(s_ui->screen_3_screen_3_count, "0 / 0");
+        return;
+    }
+
+    lv_label_set_text_fmt(s_ui->screen_3_screen_3_count, "%u / %u",
+                          (unsigned)((s_path_index % s_path_count) + 1U),
+                          (unsigned)s_path_count);
+}
+
 static void clear_media_images(void)
 {
     if (s_home_img != NULL) {
@@ -173,6 +190,8 @@ static void load_media_paths(void)
     if (s_path_count == 0) {
         clear_media_images();
     }
+
+    update_photo_count();
 
     printf("[GUI-Guider] media images loaded: %u from %s\n",
            (unsigned)s_path_count, s_active_dir[0] != '\0' ? s_active_dir : "none");
@@ -318,6 +337,8 @@ static void bind_active_media(void)
         return;
     }
 
+    update_photo_count();
+
     active = lv_scr_act();
     if (active != s_last_active_screen) {
         if (active != s_ui->screen) {
@@ -356,7 +377,8 @@ static void timer_cb(lv_timer_t *timer)
     reloaded = reload_media_paths_if_needed();
 
     active = lv_scr_act();
-    if (!reloaded && (active == s_ui->screen || active == s_ui->screen_3) && s_path_count > 1) {
+    if (!reloaded && !s_slideshow_paused &&
+        (active == s_ui->screen || active == s_ui->screen_3) && s_path_count > 1) {
         s_path_index = (s_path_index + 1) % s_path_count;
     }
 
@@ -374,6 +396,7 @@ void gui_guider_media_init(lv_ui *ui)
     s_home_applied_index = UINT32_MAX;
     s_photo_applied_index = UINT32_MAX;
     s_last_active_screen = NULL;
+    s_slideshow_paused = false;
 
     load_media_paths();
     bind_active_media();
@@ -386,4 +409,56 @@ void gui_guider_media_init(lv_ui *ui)
 void gui_guider_media_poll(void)
 {
     bind_active_media();
+}
+
+bool gui_guider_media_handle_photo_control(lv_obj_t *obj)
+{
+    if (s_ui == NULL || obj == NULL) {
+        return false;
+    }
+
+    if (obj == s_ui->screen_3_screen_3_ctrl_pause) {
+        s_slideshow_paused = true;
+        update_photo_count();
+        printf("[GUI-Guider] photo slideshow pause\n");
+        return true;
+    }
+
+    if (obj == s_ui->screen_3_screen_3_ctrl_stop) {
+        s_slideshow_paused = false;
+        update_photo_count();
+        printf("[GUI-Guider] photo slideshow play\n");
+        return true;
+    }
+
+    if (obj == s_ui->screen_3_screen_3_ctrl_prev) {
+        s_slideshow_paused = true;
+        if (s_path_count > 1) {
+            s_path_index = (s_path_index + s_path_count - 1U) % s_path_count;
+            reset_applied_images();
+        }
+        bind_active_media();
+        printf("[GUI-Guider] photo slideshow prev\n");
+        return true;
+    }
+
+    if (obj == s_ui->screen_3_screen_3_ctrl_next) {
+        s_slideshow_paused = true;
+        if (s_path_count > 1) {
+            s_path_index = (s_path_index + 1U) % s_path_count;
+            reset_applied_images();
+        }
+        bind_active_media();
+        printf("[GUI-Guider] photo slideshow next\n");
+        return true;
+    }
+
+    if (obj == s_ui->screen_3_screen_3_ctrl_zoom_in ||
+        obj == s_ui->screen_3_screen_3_ctrl_zoom_out ||
+        obj == s_ui->screen_3_screen_3_ctrl_music) {
+        printf("[GUI-Guider] photo control reserved\n");
+        return true;
+    }
+
+    return false;
 }
