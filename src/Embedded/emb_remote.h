@@ -9,6 +9,8 @@ extern "C" {
 
 #define EMB_REMOTE_MQTT_IMAGE_DIR "/usr/share/lv_projector/mqtt_images"
 #define EMB_REMOTE_MQTT_VIDEO_DIR "/usr/share/lv_projector/mqtt_videos"
+#define EMB_REMOTE_SD_IMAGE_DIR "/mnt/SDCARD/lv_projector/images"
+#define EMB_REMOTE_SD_VIDEO_DIR "/mnt/SDCARD/lv_projector/videos"
 #define EMB_REMOTE_DEFAULT_IMAGE_DIR "/usr/share/lv_projector/default_media/images"
 #define EMB_REMOTE_DEFAULT_VIDEO_DIR "/usr/share/lv_projector/default_media/videos"
 
@@ -21,6 +23,8 @@ const char *emb_remote_get_default_image_dir(void);
 const char *emb_remote_get_default_video_dir(void);
 const char *emb_remote_get_mqtt_image_dir(void);
 const char *emb_remote_get_mqtt_video_dir(void);
+const char *emb_remote_get_sd_image_dir(void);
+const char *emb_remote_get_sd_video_dir(void);
 
 #ifdef __cplusplus
 }

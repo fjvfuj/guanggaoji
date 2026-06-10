@@ -78,6 +78,9 @@ emb_result_t emb_remote_select_photo_dir(char *out_dir, size_t out_size)
     if (dir_has_supported_image(EMB_REMOTE_MQTT_IMAGE_DIR)) {
         selected = EMB_REMOTE_MQTT_IMAGE_DIR;
         emb_remote_status.template_ready = 1;
+    } else if (dir_has_supported_image(EMB_REMOTE_SD_IMAGE_DIR)) {
+        selected = EMB_REMOTE_SD_IMAGE_DIR;
+        emb_remote_status.template_ready = 0;
     } else if (dir_has_supported_image(EMB_REMOTE_DEFAULT_IMAGE_DIR)) {
         selected = EMB_REMOTE_DEFAULT_IMAGE_DIR;
         emb_remote_status.template_ready = 0;
@@ -112,4 +115,14 @@ const char *emb_remote_get_mqtt_image_dir(void)
 const char *emb_remote_get_mqtt_video_dir(void)
 {
     return EMB_REMOTE_MQTT_VIDEO_DIR;
+}
+
+const char *emb_remote_get_sd_image_dir(void)
+{
+    return EMB_REMOTE_SD_IMAGE_DIR;
+}
+
+const char *emb_remote_get_sd_video_dir(void)
+{
+    return EMB_REMOTE_SD_VIDEO_DIR;
 }

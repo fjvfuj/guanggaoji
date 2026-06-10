@@ -3,6 +3,7 @@
 #include "Embedded/emb_remote.h"
 
 #include <dirent.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 #include <strings.h>
@@ -20,8 +21,12 @@ static lv_obj_t *s_photo_parent;
 static lv_obj_t *s_photo_img;
 static lv_timer_t *s_timer;
 static char s_paths[GUI_GUIDER_MEDIA_MAX_IMAGES][GUI_GUIDER_MEDIA_PATH_MAX];
+static char s_active_dir[GUI_GUIDER_MEDIA_PATH_MAX];
 static uint32_t s_path_count;
 static uint32_t s_path_index;
+static uint32_t s_home_applied_index;
+static uint32_t s_photo_applied_index;
+static lv_obj_t *s_last_active_screen;
 
 static int is_supported_image_name(const char *name)
 {
@@ -71,9 +76,28 @@ static void scan_media_dir(const char *dir)
     closedir(dp);
 }
 
+static void reset_applied_images(void)
+{
+    s_home_applied_index = UINT32_MAX;
+    s_photo_applied_index = UINT32_MAX;
+}
+
+static void clear_media_images(void)
+{
+    if (s_home_img != NULL) {
+        lv_img_set_src(s_home_img, NULL);
+    }
+
+    if (s_photo_img != NULL) {
+        lv_img_set_src(s_photo_img, NULL);
+    }
+
+    reset_applied_images();
+}
+
 static void load_media_paths(void)
 {
-    char selected_dir[GUI_GUIDER_MEDIA_PATH_MAX];
+    char selected_dir[GUI_GUIDER_MEDIA_PATH_MAX] = {0};
 
     s_path_count = 0;
     s_path_index = 0;
@@ -85,9 +109,36 @@ static void load_media_paths(void)
 
     if (s_path_count == 0) {
         scan_media_dir(emb_remote_get_default_image_dir());
+        if (s_path_count > 0) {
+            snprintf(selected_dir, sizeof(selected_dir), "%s", emb_remote_get_default_image_dir());
+        }
     }
 
-    printf("[GUI-Guider] media images loaded: %u\n", (unsigned)s_path_count);
+    snprintf(s_active_dir, sizeof(s_active_dir), "%s", selected_dir);
+    reset_applied_images();
+
+    if (s_path_count == 0) {
+        clear_media_images();
+    }
+
+    printf("[GUI-Guider] media images loaded: %u from %s\n",
+           (unsigned)s_path_count, s_active_dir[0] != '\0' ? s_active_dir : "none");
+}
+
+static int reload_media_paths_if_needed(void)
+{
+    char selected_dir[GUI_GUIDER_MEDIA_PATH_MAX] = {0};
+
+    if (emb_remote_select_photo_dir(selected_dir, sizeof(selected_dir)) != EMB_OK) {
+        selected_dir[0] = '\0';
+    }
+
+    if (strcmp(selected_dir, s_active_dir) != 0 || s_path_count == 0) {
+        load_media_paths();
+        return 1;
+    }
+
+    return 0;
 }
 
 static void get_image_size(const char *src, uint32_t *out_w, uint32_t *out_h)
@@ -161,6 +212,7 @@ static void bind_home_media(void)
 {
     lv_coord_t w;
     lv_coord_t h;
+    uint32_t index;
 
     if (s_ui == NULL || s_ui->screen_cont_1 == NULL || s_path_count == 0) {
         return;
@@ -174,17 +226,25 @@ static void bind_home_media(void)
         lv_obj_set_style_bg_img_src(s_home_parent, NULL, LV_PART_MAIN);
         lv_obj_set_style_bg_img_opa(s_home_parent, 0, LV_PART_MAIN);
         lv_obj_set_style_bg_color(s_home_parent, lv_color_hex(0x111827), LV_PART_MAIN);
+        s_home_applied_index = UINT32_MAX;
+    }
+
+    index = s_path_index % s_path_count;
+    if (s_home_img != NULL && s_home_applied_index == index) {
+        return;
     }
 
     w = lv_obj_get_width(s_home_parent);
     h = lv_obj_get_height(s_home_parent);
     apply_image(s_home_img, w, h);
+    s_home_applied_index = index;
 }
 
 static void bind_photo_media(void)
 {
     lv_coord_t w;
     lv_coord_t h;
+    uint32_t index;
 
     if (s_ui == NULL || s_ui->screen_3_screen_3_bg_placeholder == NULL || s_path_count == 0) {
         return;
@@ -195,11 +255,18 @@ static void bind_photo_media(void)
         s_photo_img = create_media_image(s_photo_parent);
         lv_obj_clear_flag(s_photo_parent, LV_OBJ_FLAG_SCROLLABLE);
         lv_obj_set_style_clip_corner(s_photo_parent, true, LV_PART_MAIN);
+        s_photo_applied_index = UINT32_MAX;
+    }
+
+    index = s_path_index % s_path_count;
+    if (s_photo_img != NULL && s_photo_applied_index == index) {
+        return;
     }
 
     w = lv_obj_get_width(s_photo_parent);
     h = lv_obj_get_height(s_photo_parent);
     apply_image(s_photo_img, w, h);
+    s_photo_applied_index = index;
 }
 
 static void bind_active_media(void)
@@ -211,6 +278,22 @@ static void bind_active_media(void)
     }
 
     active = lv_scr_act();
+    if (active != s_last_active_screen) {
+        if (active != s_ui->screen) {
+            s_home_parent = NULL;
+            s_home_img = NULL;
+            s_home_applied_index = UINT32_MAX;
+        }
+
+        if (active != s_ui->screen_3) {
+            s_photo_parent = NULL;
+            s_photo_img = NULL;
+            s_photo_applied_index = UINT32_MAX;
+        }
+
+        s_last_active_screen = active;
+    }
+
     if (active == s_ui->screen) {
         bind_home_media();
     } else if (active == s_ui->screen_3) {
@@ -220,9 +303,19 @@ static void bind_active_media(void)
 
 static void timer_cb(lv_timer_t *timer)
 {
+    lv_obj_t *active;
+    int reloaded;
+
     (void)timer;
 
-    if (s_path_count > 1) {
+    if (s_ui == NULL) {
+        return;
+    }
+
+    reloaded = reload_media_paths_if_needed();
+
+    active = lv_scr_act();
+    if (!reloaded && (active == s_ui->screen || active == s_ui->screen_3) && s_path_count > 1) {
         s_path_index = (s_path_index + 1) % s_path_count;
     }
 
@@ -236,6 +329,10 @@ void gui_guider_media_init(lv_ui *ui)
     s_home_img = NULL;
     s_photo_parent = NULL;
     s_photo_img = NULL;
+    s_active_dir[0] = '\0';
+    s_home_applied_index = UINT32_MAX;
+    s_photo_applied_index = UINT32_MAX;
+    s_last_active_screen = NULL;
 
     load_media_paths();
     bind_active_media();
